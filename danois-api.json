@@ -1,0 +1,122 @@
+[
+  {
+    "danois": "Hej",
+    "francais": "Bonjour",
+    "exemple": "Hej, hvordan går det? (Bonjour, comment ça va ?)",
+    "cat": "Bases"
+  },
+  {
+    "danois": "Tak",
+    "francais": "Merci",
+    "exemple": "Mange tak for i dag. (Merci beaucoup pour aujourd'hui.)",
+    "cat": "Bases"
+  },
+  {
+    "danois": "Undskyld",
+    "francais": "Excusez-moi / Pardon",
+    "exemple": "Undskyld, taler du engelsk? (Excusez-moi, parlez-vous anglais ?)",
+    "cat": "Bases"
+  },
+  {
+    "danois": "Webudvikler",
+    "francais": "Développeur web",
+    "exemple": "Jeg arbejder som webudvikler hjemmefra. (Je travaille comme développeur web depuis la maison.)",
+    "cat": "Travail & Tech"
+  },
+  {
+    "danois": "Bærbar computer",
+    "francais": "Ordinateur portable",
+    "exemple": "Jeg har brug for at oplade min bærbare computer. (J'ai besoin de recharger mon ordinateur portable.)",
+    "cat": "Travail & Tech"
+  },
+  {
+    "danois": "Hund",
+    "francais": "Chien",
+    "exemple": "Må hunden komme med ind? (Le chien a-t-il le droit d'entrer ?)",
+    "cat": "Quotidien"
+  },
+  {
+    "danois": "At flytte",
+    "francais": "Déménager",
+    "exemple": "Jeg planlægger at flytte til Danmark. (Je prévois de déménager au Danemark.)",
+    "cat": "Quotidien"
+  },
+  {
+    "danois": "Lejlighed",
+    "francais": "Appartement",
+    "exemple": "Jeg leder efter en lys lejlighed at leje. (Je cherche un appartement lumineux à louer.)",
+    "cat": "Quotidien"
+  },
+  {
+    "danois": "Vegansk",
+    "francais": "Végan",
+    "exemple": "Har I nogle veganske muligheder på menuen? (Avez-vous des options véganes au menu ?)",
+    "cat": "Nourriture"
+  },
+  {
+    "danois": "Vegetar",
+    "francais": "Végétarien",
+    "exemple": "Jeg er vegetar, jeg spiser ikke kød. (Je suis végétarien, je ne mange pas de viande.)",
+    "cat": "Nourriture"
+  },
+  {
+    "danois": "Kaffebønner",
+    "francais": "Grains de café",
+    "exemple": "Hvor kan jeg købe kaffebønner til min espressomaskine? (Où puis-je acheter des grains de café pour ma machine à expresso ?)",
+    "cat": "Nourriture"
+  },
+  {
+    "danois": "Styrketræning",
+    "francais": "Musculation",
+    "exemple": "Jeg elsker at dyrke styrketræning fire gange om ugen. (J'adore faire de la musculation quatre fois par semaine.)",
+    "cat": "Sport & Loisirs"
+  },
+  {
+    "danois": "Fitnesscenter",
+    "francais": "Salle de sport",
+    "exemple": "Hvor er det nærmeste fitnesscenter? (Où est la salle de sport la plus proche ?)",
+    "cat": "Sport & Loisirs"
+  },
+  {
+    "danois": "Videospil",
+    "francais": "Jeux vidéo",
+    "exemple": "Jeg kan godt lide at spille videospil om aftenen. (J'aime jouer aux jeux vidéo le soir.)",
+    "cat": "Sport & Loisirs"
+  },
+  {
+    "danois": "Supermarked",
+    "francais": "Supermarché",
+    "exemple": "Jeg skal købe ind i supermarkedet. (Je dois faire les courses au supermarché.)",
+    "cat": "Quotidien"
+  },
+  {
+    "danois": "Togstation",
+    "francais": "Gare",
+    "exemple": "Hvordan kommer jeg til togstationen? (Comment puis-je aller à la gare ?)",
+    "cat": "Transports"
+  },
+  {
+    "danois": "Lufthavn",
+    "francais": "Aéroport",
+    "exemple": "Hvilken bus kører til lufthavnen? (Quel bus va à l'aéroport ?)",
+    "cat": "Transports"
+  },
+  {
+    "danois": "At kode",
+    "francais": "Coder",
+    "exemple": "Jeg bruger meget tid på at kode. (Je passe beaucoup de temps à coder.)",
+    "cat": "Travail & Tech"
+  },
+  {
+    "danois": "Regning",
+    "francais": "L'addition",
+    "exemple": "Må jeg bede om regningen, tak? (Puis-je avoir l'addition, s'il vous plaît ?)",
+    "cat": "Nourriture"
+  },
+  {
+    "danois": "Vejr",
+    "francais": "Météo / Temps",
+    "exemple": "Vejret er meget koldt i dag. (Le temps est très froid aujourd'hui.)",
+    "cat": "Quotidien"
+  }
+]
