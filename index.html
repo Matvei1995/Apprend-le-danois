@@ -19,7 +19,17 @@
     <header class="bg-[#C60C30] text-white shadow-md">
         <div class="max-w-4xl mx-auto px-4 py-6 text-center">
             <h1 class="text-3xl font-bold mb-2">DanskLærer</h1>
-            <p class="text-sm opacity-90 mb-4">Votre progression : <span id="score-display" class="font-bold">0</span> mots maîtrisés</p>
+            <p class="text-sm opacity-90 mb-4">Progression : <span id="score-display" class="font-bold">0</span> mots maîtrisés</p>
+            
+            <!-- Sélecteur de Thème Global -->
+            <div class="mb-4 flex justify-center items-center space-x-2">
+                <label for="global-category" class="font-semibold text-sm">Thème :</label>
+                <select id="global-category" onchange="changeCategory(this.value)" class="p-2 rounded text-gray-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-white">
+                    <option value="Toutes">Tous les mots</option>
+                    <!-- Options injectées par JS -->
+                </select>
+            </div>
+
             <nav class="flex justify-center space-x-2 sm:space-x-4">
                 <button onclick="switchTab('vocab')" class="px-4 py-2 bg-white text-[#C60C30] rounded-md font-semibold shadow hover:bg-gray-100 transition">Lexique</button>
                 <button onclick="switchTab('flashcards')" class="px-4 py-2 bg-red-800 text-white rounded-md font-semibold shadow hover:bg-red-700 transition">Flashcards</button>
@@ -28,23 +38,21 @@
         </div>
     </header>
 
-    <main class="flex-grow max-w-4xl mx-auto p-4 w-full mt-6">
+    <main class="flex-grow max-w-4xl mx-auto p-4 w-full mt-4">
         
-        <!-- Loader d'API -->
         <div id="loader" class="flex flex-col items-center justify-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#C60C30] mb-4"></div>
-            <p class="text-gray-500 font-semibold animate-pulse">Connexion à l'API en cours...</p>
+            <p class="text-gray-500 font-semibold animate-pulse">Chargement du vocabulaire...</p>
         </div>
 
-        <!-- Contenu de l'App (Masqué pendant le chargement) -->
         <div id="app-content" class="hidden w-full">
+            <!-- MODULE LEXIQUE -->
             <section id="vocab" class="tab-content block">
-                <h2 class="text-2xl font-bold mb-6 text-gray-700 border-b pb-2">Vocabulaire & Contexte</h2>
                 <div id="vocab-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
             </section>
 
+            <!-- MODULE FLASHCARDS -->
             <section id="flashcards" class="tab-content hidden flex flex-col items-center">
-                <h2 class="text-2xl font-bold mb-6 text-gray-700">Répétition Spacée</h2>
                 <div class="w-full max-w-md h-64 perspective-1000 cursor-pointer" onclick="flipCard()">
                     <div id="flashcard-inner" class="flashcard-inner w-full h-full relative transform-style-3d shadow-xl rounded-xl">
                         <div class="absolute w-full h-full bg-white backface-hidden rounded-xl flex flex-col items-center justify-center p-6 border-2 border-gray-100">
@@ -63,8 +71,8 @@
                 </div>
             </section>
 
+            <!-- MODULE QUIZ -->
             <section id="quiz" class="tab-content hidden max-w-lg mx-auto w-full">
-                <h2 class="text-2xl font-bold mb-6 text-gray-700 text-center">Testez vos connaissances</h2>
                 <div class="bg-white p-6 rounded-xl shadow-md w-full">
                     <div class="flex justify-between items-center mb-6">
                         <p id="quiz-question" class="text-2xl font-bold text-gray-800"></p>
@@ -79,38 +87,57 @@
     </main>
 
     <script>
-        let words = []; // Sera rempli par l'API
+        let allWords = []; 
+        let filteredWords = [];
+        let currentTab = 'vocab';
         let masteredWords = parseInt(localStorage.getItem('danishMastered')) || 0;
         document.getElementById('score-display').innerText = masteredWords;
 
-        // --- APPEL API (FETCH) ---
         async function fetchVocabulary() {
             try {
                 const response = await fetch('danois-api.json');
                 if (!response.ok) throw new Error('Erreur HTTP');
                 
-                words = await response.json();
+                allWords = await response.json();
+                filteredWords = [...allWords]; // Par défaut, on prend tout
+                
+                populateCategories();
                 
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('app-content').classList.remove('hidden');
                 
-                initVocab();
+                renderApp();
             } catch (error) {
-                console.error("Erreur lors de l'appel API :", error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold">Erreur : Impossible de charger le fichier API (danois-api.json).</p>';
+                console.error("Erreur API :", error);
+                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold">Erreur de chargement (danois-api.json).</p>';
             }
         }
 
-        function speakDanish(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'da-DK'; 
-                utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
+        function populateCategories() {
+            const select = document.getElementById('global-category');
+            const categories = [...new Set(allWords.map(w => w.cat))].sort();
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        function changeCategory(category) {
+            if (category === "Toutes") {
+                filteredWords = [...allWords];
+            } else {
+                filteredWords = allWords.filter(w => w.cat === category);
             }
+            renderApp(); // Met à jour la vue active
+        }
+
+        function renderApp() {
+            if (currentTab === 'vocab') initVocab();
+            if (currentTab === 'flashcards') nextCard();
+            if (currentTab === 'quiz') generateQuiz();
         }
 
         function switchTab(tabId) {
+            currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
@@ -122,20 +149,28 @@
             event.currentTarget.classList.add('bg-white', 'text-[#C60C30]');
             event.currentTarget.classList.remove('bg-red-800', 'text-white');
 
-            if(tabId === 'flashcards' && (!document.getElementById('fc-dk').innerText || document.getElementById('fc-dk').innerText === "")) nextCard();
-            if(tabId === 'quiz') generateQuiz();
+            renderApp();
+        }
+
+        function speakDanish(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'da-DK'; 
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
         }
 
         function initVocab() {
             const container = document.getElementById('vocab-list');
-            container.innerHTML = ''; // Vide la liste avant de la remplir
-            words.forEach(word => {
+            container.innerHTML = ''; 
+            filteredWords.forEach(word => {
                 container.innerHTML += `
                     <div class="bg-white p-5 rounded-xl shadow border-l-4 border-[#C60C30] flex flex-col justify-between hover:shadow-md transition">
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="text-xl font-bold text-gray-800">${word.danois}</h3>
-                                <button onclick="speakDanish('${word.danois.replace(/'/g, "\\'")}')" class="text-xl p-1 hover:scale-110 transition" title="Écouter">🔊</button>
+                                <button onclick="speakDanish('${word.danois.replace(/'/g, "\\'")}')" class="text-xl p-1 hover:scale-110 transition">🔊</button>
                             </div>
                             <p class="text-md text-gray-600 font-semibold mb-3">${word.francais}</p>
                             <p class="text-sm text-gray-500 italic bg-gray-50 p-2 rounded">${word.exemple}</p>
@@ -146,17 +181,18 @@
             });
         }
 
-        let currentCardIndex = -1;
         function flipCard() {
             document.getElementById('flashcard-inner').parentNode.classList.toggle('flipped');
         }
+
         function nextCard() {
             document.getElementById('flashcard-inner').parentNode.classList.remove('flipped');
             setTimeout(() => {
-                currentCardIndex = Math.floor(Math.random() * words.length);
-                document.getElementById('fc-dk').innerText = words[currentCardIndex].danois;
-                document.getElementById('fc-fr').innerText = words[currentCardIndex].francais;
-                document.getElementById('fc-ex').innerText = words[currentCardIndex].exemple;
+                const randIndex = Math.floor(Math.random() * filteredWords.length);
+                const word = filteredWords[randIndex];
+                document.getElementById('fc-dk').innerText = word.danois;
+                document.getElementById('fc-fr').innerText = word.francais;
+                document.getElementById('fc-ex').innerText = word.exemple;
             }, 150);
         }
 
@@ -167,12 +203,14 @@
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
 
-            currentQuizWord = words[Math.floor(Math.random() * words.length)];
+            // Sélectionne un mot aléatoire dans la liste filtrée
+            currentQuizWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
             document.getElementById('quiz-question').innerText = `Que signifie "${currentQuizWord.danois}" ?`;
 
             let options = [currentQuizWord];
             while (options.length < 3) {
-                let randomWord = words[Math.floor(Math.random() * words.length)];
+                // Les mauvaises réponses peuvent venir de toute la base pour éviter que ce soit trop facile
+                let randomWord = allWords[Math.floor(Math.random() * allWords.length)];
                 if (!options.includes(randomWord)) options.push(randomWord);
             }
             options.sort(() => Math.random() - 0.5);
@@ -195,7 +233,7 @@
             if (selectedOpt.danois === currentQuizWord.danois) {
                 btn.classList.replace('border-gray-200', 'border-green-500');
                 btn.classList.add('bg-green-50', 'text-green-700');
-                feedback.innerText = "Korrekt ! (Correct !)";
+                feedback.innerText = "Korrekt !";
                 feedback.className = "mt-4 font-bold text-center text-green-600 block";
                 speakDanish('Korrekt');
                 
@@ -205,14 +243,13 @@
             } else {
                 btn.classList.replace('border-gray-200', 'border-red-500');
                 btn.classList.add('bg-red-50', 'text-red-700');
-                feedback.innerText = `Forkert. La bonne réponse était : ${currentQuizWord.francais}`;
+                feedback.innerText = `Forkert. La bonne réponse : ${currentQuizWord.francais}`;
                 feedback.className = "mt-4 font-bold text-center text-red-600 block";
                 speakDanish(currentQuizWord.danois);
             }
             document.getElementById('quiz-next-btn').classList.remove('hidden');
         }
 
-        // Lancement de l'application via la requête API
         fetchVocabulary();
     </script>
 </body>

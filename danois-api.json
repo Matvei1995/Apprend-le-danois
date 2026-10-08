@@ -1,122 +1,59 @@
 [
-  {
-    "danois": "Hej",
-    "francais": "Bonjour",
-    "exemple": "Hej, hvordan går det? (Bonjour, comment ça va ?)",
-    "cat": "Bases"
-  },
-  {
-    "danois": "Tak",
-    "francais": "Merci",
-    "exemple": "Mange tak for i dag. (Merci beaucoup pour aujourd'hui.)",
-    "cat": "Bases"
-  },
-  {
-    "danois": "Undskyld",
-    "francais": "Excusez-moi / Pardon",
-    "exemple": "Undskyld, taler du engelsk? (Excusez-moi, parlez-vous anglais ?)",
-    "cat": "Bases"
-  },
-  {
-    "danois": "Webudvikler",
-    "francais": "Développeur web",
-    "exemple": "Jeg arbejder som webudvikler hjemmefra. (Je travaille comme développeur web depuis la maison.)",
-    "cat": "Travail & Tech"
-  },
-  {
-    "danois": "Bærbar computer",
-    "francais": "Ordinateur portable",
-    "exemple": "Jeg har brug for at oplade min bærbare computer. (J'ai besoin de recharger mon ordinateur portable.)",
-    "cat": "Travail & Tech"
-  },
-  {
-    "danois": "Hund",
-    "francais": "Chien",
-    "exemple": "Må hunden komme med ind? (Le chien a-t-il le droit d'entrer ?)",
-    "cat": "Quotidien"
-  },
-  {
-    "danois": "At flytte",
-    "francais": "Déménager",
-    "exemple": "Jeg planlægger at flytte til Danmark. (Je prévois de déménager au Danemark.)",
-    "cat": "Quotidien"
-  },
-  {
-    "danois": "Lejlighed",
-    "francais": "Appartement",
-    "exemple": "Jeg leder efter en lys lejlighed at leje. (Je cherche un appartement lumineux à louer.)",
-    "cat": "Quotidien"
-  },
-  {
-    "danois": "Vegansk",
-    "francais": "Végan",
-    "exemple": "Har I nogle veganske muligheder på menuen? (Avez-vous des options véganes au menu ?)",
-    "cat": "Nourriture"
-  },
-  {
-    "danois": "Vegetar",
-    "francais": "Végétarien",
-    "exemple": "Jeg er vegetar, jeg spiser ikke kød. (Je suis végétarien, je ne mange pas de viande.)",
-    "cat": "Nourriture"
-  },
-  {
-    "danois": "Kaffebønner",
-    "francais": "Grains de café",
-    "exemple": "Hvor kan jeg købe kaffebønner til min espressomaskine? (Où puis-je acheter des grains de café pour ma machine à expresso ?)",
-    "cat": "Nourriture"
-  },
-  {
-    "danois": "Styrketræning",
-    "francais": "Musculation",
-    "exemple": "Jeg elsker at dyrke styrketræning fire gange om ugen. (J'adore faire de la musculation quatre fois par semaine.)",
-    "cat": "Sport & Loisirs"
-  },
-  {
-    "danois": "Fitnesscenter",
-    "francais": "Salle de sport",
-    "exemple": "Hvor er det nærmeste fitnesscenter? (Où est la salle de sport la plus proche ?)",
-    "cat": "Sport & Loisirs"
-  },
-  {
-    "danois": "Videospil",
-    "francais": "Jeux vidéo",
-    "exemple": "Jeg kan godt lide at spille videospil om aftenen. (J'aime jouer aux jeux vidéo le soir.)",
-    "cat": "Sport & Loisirs"
-  },
-  {
-    "danois": "Supermarked",
-    "francais": "Supermarché",
-    "exemple": "Jeg skal købe ind i supermarkedet. (Je dois faire les courses au supermarché.)",
-    "cat": "Quotidien"
-  },
-  {
-    "danois": "Togstation",
-    "francais": "Gare",
-    "exemple": "Hvordan kommer jeg til togstationen? (Comment puis-je aller à la gare ?)",
-    "cat": "Transports"
-  },
-  {
-    "danois": "Lufthavn",
-    "francais": "Aéroport",
-    "exemple": "Hvilken bus kører til lufthavnen? (Quel bus va à l'aéroport ?)",
-    "cat": "Transports"
-  },
-  {
-    "danois": "At kode",
-    "francais": "Coder",
-    "exemple": "Jeg bruger meget tid på at kode. (Je passe beaucoup de temps à coder.)",
-    "cat": "Travail & Tech"
-  },
-  {
-    "danois": "Regning",
-    "francais": "L'addition",
-    "exemple": "Må jeg bede om regningen, tak? (Puis-je avoir l'addition, s'il vous plaît ?)",
-    "cat": "Nourriture"
-  },
-  {
-    "danois": "Vejr",
-    "francais": "Météo / Temps",
-    "exemple": "Vejret er meget koldt i dag. (Le temps est très froid aujourd'hui.)",
-    "cat": "Quotidien"
-  }
+  { "danois": "Hej", "francais": "Bonjour", "exemple": "Hej, hvordan går det? (Bonjour, comment ça va ?)", "cat": "Bases" },
+  { "danois": "Goddag", "francais": "Bonjour (formel)", "exemple": "Goddag, jeg har en aftale. (Bonjour, j'ai un rendez-vous.)", "cat": "Bases" },
+  { "danois": "Tak", "francais": "Merci", "exemple": "Mange tak for hjælpen. (Merci beaucoup pour l'aide.)", "cat": "Bases" },
+  { "danois": "Undskyld", "francais": "Excusez-moi", "exemple": "Undskyld, taler du engelsk? (Excusez-moi, parlez-vous anglais ?)", "cat": "Bases" },
+  { "danois": "Ja / Nej", "francais": "Oui / Non", "exemple": "Ja tak, det vil jeg gerne. (Oui merci, je veux bien.)", "cat": "Bases" },
+  { "danois": "Det går godt", "francais": "Ça va bien", "exemple": "Tak, det går meget godt. Hvad med dig? (Merci, ça va très bien. Et toi ?)", "cat": "Bases" },
+
+  { "danois": "At hedde", "francais": "S'appeler", "exemple": "Jeg hedder Matvei. (Je m'appelle Matvei.)", "cat": "Présentations" },
+  { "danois": "Frankrig", "francais": "France", "exemple": "Jeg kommer fra Frankrig. (Je viens de France.)", "cat": "Présentations" },
+  { "danois": "Webudvikler", "francais": "Développeur web", "exemple": "Jeg arbejder som freelance webudvikler. (Je travaille comme développeur web freelance.)", "cat": "Présentations" },
+  
+  { "danois": "At flytte", "francais": "Déménager", "exemple": "Jeg planlægger at flytte til Danmark snart. (Je prévois de déménager au Danemark bientôt.)", "cat": "Expatriation" },
+  { "danois": "Lejlighed", "francais": "Appartement", "exemple": "Vi leder efter en lejlighed at leje. (Nous cherchons un appartement à louer.)", "cat": "Expatriation" },
+  { "danois": "CPR-nummer", "francais": "Numéro de sécurité sociale danois", "exemple": "Jeg skal registrere mig for at få et CPR-nummer. (Je dois m'inscrire pour obtenir un numéro CPR.)", "cat": "Expatriation" },
+  { "danois": "Kommune", "francais": "Mairie / Municipalité", "exemple": "Jeg har en tid hos kommunen i morgen. (J'ai rendez-vous à la mairie demain.)", "cat": "Expatriation" },
+
+  { "danois": "Hund", "francais": "Chien", "exemple": "Jeg har en hund, det er en Akita. (J'ai un chien, c'est un Akita.)", "cat": "Animaux" },
+  { "danois": "Rolig", "francais": "Calme", "exemple": "Min hund er meget rolig og venlig. (Mon chien est très calme et amical.)", "cat": "Animaux" },
+  { "danois": "At gå en tur", "francais": "Se promener", "exemple": "Jeg skal ud at gå en tur med hunden. (Je dois sortir me promener avec le chien.)", "cat": "Animaux" },
+  { "danois": "Dyrlæge", "francais": "Vétérinaire", "exemple": "Hvor er den nærmeste dyrlæge? (Où est le vétérinaire le plus proche ?)", "cat": "Animaux" },
+
+  { "danois": "Vegetar", "francais": "Végétarien", "exemple": "Jeg er vegetar. (Je suis végétarien.)", "cat": "Nourriture" },
+  { "danois": "Vegansk", "francais": "Végan", "exemple": "Har I veganske muligheder på menuen? (Avez-vous des options véganes au menu ?)", "cat": "Nourriture" },
+  { "danois": "Uden gluten", "francais": "Sans gluten", "exemple": "Er denne pizza uden gluten? (Cette pizza est-elle sans gluten ?)", "cat": "Nourriture" },
+  { "danois": "Kaffebønner", "francais": "Grains de café", "exemple": "Jeg skal købe kaffebønner til min espressomaskine. (Je dois acheter des grains de café pour ma machine à expresso.)", "cat": "Nourriture" },
+
+  { "danois": "Frugt", "francais": "Fruit", "exemple": "Vi skal købe frisk frugt i supermarkedet. (Nous devons acheter des fruits frais au supermarché.)", "cat": "Fruits" },
+  { "danois": "Æble", "francais": "Pomme", "exemple": "Jeg spiser et æble hver dag. (Je mange une pomme tous les jours.)", "cat": "Fruits" },
+  { "danois": "Banan", "francais": "Banane", "exemple": "Jeg bager en banankage uden æg. (Je prépare un gâteau à la banane sans œufs.)", "cat": "Fruits" },
+  { "danois": "Jordbær", "francais": "Fraise", "exemple": "Danske jordbær er meget søde om sommeren. (Les fraises danoises sont très sucrées en été.)", "cat": "Fruits" },
+  { "danois": "Appelsin", "francais": "Orange", "exemple": "Jeg drikker et glas appelsinjuice. (Je bois un verre de jus d'orange.)", "cat": "Fruits" },
+  { "danois": "Citron", "francais": "Citron", "exemple": "Jeg vil gerne have lidt citron i min te. (Je voudrais un peu de citron dans mon thé.)", "cat": "Fruits" },
+
+  { "danois": "Sundhed", "francais": "Santé", "exemple": "Sundhed er det vigtigste. (La santé est la chose la plus importante.)", "cat": "Santé" },
+  { "danois": "Læge", "francais": "Médecin", "exemple": "Jeg har en aftale hos lægen klokken ti. (J'ai rendez-vous chez le médecin à dix heures.)", "cat": "Santé" },
+  { "danois": "Syg", "francais": "Malade", "exemple": "Jeg kan ikke arbejde i dag, jeg er syg. (Je ne peux pas travailler aujourd'hui, je suis malade.)", "cat": "Santé" },
+  { "danois": "Apotek", "francais": "Pharmacie", "exemple": "Hvor ligger det nærmeste apotek? (Où se trouve la pharmacie la plus proche ?)", "cat": "Santé" },
+  { "danois": "Medicin", "francais": "Médicament", "exemple": "Jeg skal hente min medicin på apoteket. (Je dois aller chercher mes médicaments à la pharmacie.)", "cat": "Santé" },
+  { "danois": "At have ondt", "francais": "Avoir mal", "exemple": "Jeg har ondt i hovedet. (J'ai mal à la tête.)", "cat": "Santé" },
+  { "danois": "Hospital", "francais": "Hôpital", "exemple": "Hvor er hospitalet? (Où est l'hôpital ?)", "cat": "Santé" },
+
+  { "danois": "Styrketræning", "francais": "Musculation", "exemple": "Jeg dyrker styrketræning fire gange om ugen. (Je fais de la musculation quatre fois par semaine.)", "cat": "Sport & Santé" },
+  { "danois": "Fitnesscenter", "francais": "Salle de sport", "exemple": "Hvad koster et medlemskab i fitnesscenteret? (Combien coûte un abonnement à la salle de sport ?)", "cat": "Sport & Santé" },
+  { "danois": "At løfte vægte", "francais": "Soulever des poids", "exemple": "Jeg kan godt lide at løfte vægte. (J'aime soulever des poids.)", "cat": "Sport & Santé" },
+
+  { "danois": "At kode", "francais": "Coder", "exemple": "Jeg elsker at kode i JavaScript og React. (J'adore coder en JavaScript et React.)", "cat": "Tech & Travail" },
+  { "danois": "Bærbar computer", "francais": "Ordinateur portable", "exemple": "Min bærbare computer er en Mac. (Mon ordinateur portable est un Mac.)", "cat": "Tech & Travail" },
+  { "danois": "Hjemmearbejde", "francais": "Télétravail", "exemple": "Jeg arbejder meget hjemmefra. (Je travaille beaucoup en télétravail.)", "cat": "Tech & Travail" },
+  { "danois": "Skærm", "francais": "Écran", "exemple": "Jeg har brug for en ekstra skærm til mit arbejde. (J'ai besoin d'un écran supplémentaire pour mon travail.)", "cat": "Tech & Travail" },
+
+  { "danois": "Videospil", "francais": "Jeux vidéo", "exemple": "Jeg spiller videospil på min Nintendo Switch. (Je joue aux jeux vidéo sur ma Nintendo Switch.)", "cat": "Loisirs" },
+  { "danois": "At slappe af", "francais": "Se détendre", "exemple": "Jeg vil bare slappe af i aften. (Je veux juste me détendre ce soir.)", "cat": "Loisirs" },
+  { "danois": "At rejse", "francais": "Voyager", "exemple": "Vi elsker at rejse rundt i Europa. (Nous adorons voyager à travers l'Europe.)", "cat": "Loisirs" },
+
+  { "danois": "Togstation", "francais": "Gare", "exemple": "Hvordan kommer jeg til togstationen? (Comment puis-je aller à la gare ?)", "cat": "Déplacements" },
+  { "danois": "Lufthavn", "francais": "Aéroport", "exemple": "Bussen kører direkte til lufthavnen. (Le bus va directement à l'aéroport.)", "cat": "Déplacements" },
+  { "danois": "Billet", "francais": "Billet / Ticket", "exemple": "Hvor kan jeg købe en billet? (Où puis-je acheter un billet ?)", "cat": "Déplacements" }
 ]
