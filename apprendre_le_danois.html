@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lær Dansk - Apprendre le Danois</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAFAFA; /* Off-white scandinave */
+            color: #333333;
+        }
+        
+        .danish-red {
+            background-color: #C60C30;
+            color: white;
+        }
+        
+        .danish-text {
+            color: #C60C30;
+        }
+
+        /* Styles pour les flashcards (effet 3D de retournement) */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            padding: 2rem;
+            background-color: white;
+            border: 2px solid #f0f0f0;
+        }
+
+        .flashcard-front {
+            /* Face danoise */
+        }
+
+        .flashcard-back {
+            /* Face française */
+            transform: rotateY(180deg);
+            background-color: #C60C30;
+            color: white;
+            border-color: #C60C30;
+        }
+
+        /* Animations personnalisées */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white shadow-sm border-b-4 border-[#C60C30] sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigateTo('dashboard')">
+                    <div class="w-8 h-8 danish-red rounded flex items-center justify-center mr-3 font-bold text-lg shadow-sm">
+                        DK
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">Lær Dansk</span>
+                </div>
+                <!-- Navigation Desktop -->
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="navigateTo('vocab')" class="text-gray-500 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium transition-colors">Vocabulaire</button>
+                    <button onclick="navigateTo('flashcards')" class="text-gray-500 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium transition-colors">Flashcards</button>
+                    <button onclick="navigateTo('quiz')" class="text-gray-500 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium transition-colors">Quiz</button>
+                </nav>
+                <!-- Menu Mobile Bouton -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-gray-900 focus:outline-none p-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Menu Mobile Panel -->
+        <div id="mobile-menu" class="md:hidden hide bg-white border-t border-gray-100">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="navigateTo('vocab')" class="block w-full text-left text-gray-700 hover:bg-gray-50 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium">Vocabulaire</button>
+                <button onclick="navigateTo('flashcards')" class="block w-full text-left text-gray-700 hover:bg-gray-50 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium">Flashcards</button>
+                <button onclick="navigateTo('quiz')" class="block w-full text-left text-gray-700 hover:bg-gray-50 hover:text-[#C60C30] px-3 py-2 rounded-md font-medium">Quiz</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <div id="view-dashboard" class="animate-fade-in space-y-8">
+            <div class="text-center py-12 px-4 sm:px-6 lg:px-8 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Velkommen! <span class="text-2xl font-normal text-gray-500 block mt-2">(Bienvenue !)</span></h1>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">Découvrez la beauté de la langue danoise grâce à notre méthode simple et épurée. Choisissez une activité ci-dessous pour commencer.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card Vocab -->
+                <div onclick="navigateTo('vocab')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow group">
+                    <div class="w-12 h-12 rounded-full bg-red-50 text-[#C60C30] flex items-center justify-center text-xl mb-4 group-hover:bg-[#C60C30] group-hover:text-white transition-colors">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Vocabulaire</h3>
+                    <p class="text-gray-500 text-sm">Apprenez les mots essentiels classés par catégories (Salutations, Nombres, etc.).</p>
+                </div>
+                <!-- Card Flashcards -->
+                <div onclick="navigateTo('flashcards')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow group">
+                    <div class="w-12 h-12 rounded-full bg-red-50 text-[#C60C30] flex items-center justify-center text-xl mb-4 group-hover:bg-[#C60C30] group-hover:text-white transition-colors">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Flashcards</h3>
+                    <p class="text-gray-500 text-sm">Mémorisez le vocabulaire de manière interactive avec des cartes à retourner.</p>
+                </div>
+                <!-- Card Quiz -->
+                <div onclick="navigateTo('quiz')" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow group">
+                    <div class="w-12 h-12 rounded-full bg-red-50 text-[#C60C30] flex items-center justify-center text-xl mb-4 group-hover:bg-[#C60C30] group-hover:text-white transition-colors">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Quiz rapide</h3>
+                    <p class="text-gray-500 text-sm">Testez vos connaissances et suivez votre progression en temps réel.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VOCABULARY VIEW ================= -->
+        <div id="view-vocab" class="hide animate-fade-in space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-900">Vocabulaire</h2>
+                <div class="mt-4 md:mt-0">
+                    <select id="vocab-category-select" onchange="renderVocabulary()" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#C60C30] focus:border-[#C60C30] sm:text-sm rounded-md shadow-sm bg-white border border-gray-300">
+                        <option value="all">Toutes les catégories</option>
+                        <option value="greetings">Salutations</option>
+                        <option value="numbers">Nombres</option>
+                        <option value="colors">Couleurs</option>
+                        <option value="basics">Phrases de base</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injecté via JS -->
+            </div>
+        </div>
+
+        <!-- ================= FLASHCARDS VIEW ================= -->
+        <div id="view-flashcards" class="hide animate-fade-in flex flex-col items-center justify-center py-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Flashcards</h2>
+            <p class="text-gray-500 mb-8 text-center">Cliquez sur la carte pour voir la traduction.</p>
+
+            <div class="mb-6">
+                <select id="flashcard-category-select" onchange="initFlashcards()" class="block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#C60C30] focus:border-[#C60C30] sm:text-sm rounded-md shadow-sm bg-white border border-gray-300 text-center mx-auto">
+                    <option value="all">Tout réviser</option>
+                    <option value="greetings">Salutations</option>
+                    <option value="numbers">Nombres</option>
+                    <option value="colors">Couleurs</option>
+                    <option value="basics">Phrases de base</option>
+                </select>
+            </div>
+
+            <div class="flashcard-container" onclick="toggleFlashcard()">
+                <div id="flashcard-element" class="flashcard">
+                    <div class="flashcard-face flashcard-front">
+                        <span id="fc-da" class="text-4xl font-bold text-gray-900 mb-4"></span>
+                        <span id="fc-phon" class="text-lg text-gray-500 italic"></span>
+                        <div class="absolute bottom-4 text-xs text-gray-400 flex items-center gap-1">
+                            <i class="fas fa-hand-pointer"></i> Cliquer pour retourner
+                        </div>
+                    </div>
+                    <div class="flashcard-face flashcard-back">
+                        <span id="fc-fr" class="text-3xl font-bold mb-2"></span>
+                        <div class="w-12 h-1 bg-white opacity-50 rounded mb-4"></div>
+                        <span id="fc-cat" class="text-sm uppercase tracking-wider opacity-80"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center space-x-6 mt-8">
+                <button onclick="prevFlashcard()" class="w-12 h-12 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-[#C60C30] hover:border-[#C60C30] shadow-sm flex items-center justify-center transition-all focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span id="fc-counter" class="text-gray-500 font-medium w-16 text-center">1 / 10</span>
+                <button onclick="nextFlashcard()" class="w-12 h-12 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-[#C60C30] hover:border-[#C60C30] shadow-sm flex items-center justify-center transition-all focus:outline-none">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ VIEW ================= -->
+        <div id="view-quiz" class="hide animate-fade-in max-w-2xl mx-auto py-8">
+            
+            <div id="quiz-intro" class="text-center bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Prêt pour le test ?</h2>
+                <p class="text-gray-600 mb-8">Nous allons vous poser 10 questions aléatoires sur l'ensemble du vocabulaire. Trouvez la bonne traduction française pour chaque mot danois.</p>
+                <button onclick="startQuiz()" class="danish-red hover:bg-red-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors focus:outline-none">
+                    Commencer le Quiz
+                </button>
+            </div>
+
+            <div id="quiz-active" class="hide bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <span id="quiz-progress" class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Question 1/10</span>
+                    <span id="quiz-score-display" class="text-sm font-bold text-[#C60C30] bg-red-50 px-3 py-1 rounded-full">Score: 0</span>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-sm text-gray-500 mb-2">Que signifie :</h3>
+                    <div id="quiz-question" class="text-4xl font-bold text-gray-900 text-center py-8 bg-gray-50 rounded-xl border border-gray-100">
+                        Ord
+                    </div>
+                </div>
+
+                <div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Options injectées via JS -->
+                </div>
+
+                <div id="quiz-feedback" class="mt-6 text-center h-8 font-semibold text-lg hidden">
+                    <!-- Feedback (Vrai/Faux) -->
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-full shadow transition-colors focus:outline-none">
+                        Question suivante <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz-results" class="hide text-center bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
+                <div class="w-20 h-20 mx-auto bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mb-6">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Quiz Terminé !</h2>
+                <p class="text-gray-600 mb-6">Voici votre score final :</p>
+                <div class="text-5xl font-bold danish-text mb-8" id="final-score">8/10</div>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="startQuiz()" class="danish-red hover:bg-red-800 text-white font-semibold py-3 px-6 rounded-full shadow transition-colors focus:outline-none">
+                        Rejouer
+                    </button>
+                    <button onclick="navigateTo('dashboard')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-full transition-colors focus:outline-none">
+                        Retour au menu
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-sm text-gray-500">© 2026 Lær Dansk. Design minimaliste scandinave.</p>
+            <div class="flex space-x-4 mt-4 md:mt-0 text-gray-400">
+                <i class="fab fa-twitter hover:text-gray-600 cursor-pointer transition-colors"></i>
+                <i class="fab fa-github hover:text-gray-600 cursor-pointer transition-colors"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // === DONNÉES DU VOCABULAIRE ===
+        const vocabularyData = {
+            greetings: {
+                title: "Salutations",
+                words: [
+                    { da: "Hej", fr: "Bonjour / Salut", phon: "haï" },
+                    { da: "Godmorgen", fr: "Bonjour (matin)", phon: "go-morn" },
+                    { da: "Godaften", fr: "Bonsoir", phon: "go-af-tèn" },
+                    { da: "Farvel", fr: "Au revoir", phon: "far-vel" },
+                    { da: "Tak", fr: "Merci", phon: "tack" },
+                    { da: "Undskyld", fr: "Pardon / Excusez-moi", phon: "oun-skul" },
+                    { da: "Ja", fr: "Oui", phon: "ya" },
+                    { da: "Nej", fr: "Non", phon: "naï" }
+                ]
+            },
+            numbers: {
+                title: "Nombres",
+                words: [
+                    { da: "En / Et", fr: "Un", phon: "éne / éte" },
+                    { da: "To", fr: "Deux", phon: "to" },
+                    { da: "Tre", fr: "Trois", phon: "tré" },
+                    { da: "Fire", fr: "Quatre", phon: "fi-eur" },
+                    { da: "Fem", fr: "Cinq", phon: "fem" },
+                    { da: "Seks", fr: "Six", phon: "sex" },
+                    { da: "Syv", fr: "Sept", phon: "su" },
+                    { da: "Otte", fr: "Huit", phon: "o-de" },
+                    { da: "Ni", fr: "Neuf", phon: "ni" },
+                    { da: "Ti", fr: "Dix", phon: "ti" }
+                ]
+            },
+            colors: {
+                title: "Couleurs",
+                words: [
+                    { da: "Rød", fr: "Rouge", phon: "reul" },
+                    { da: "Hvid", fr: "Blanc", phon: "vil" },
+                    { da: "Blå", fr: "Bleu", phon: "blo" },
+                    { da: "Grøn", fr: "Vert", phon: "greun" },
+                    { da: "Gul", fr: "Jaune", phon: "goul" },
+                    { da: "Sort", fr: "Noir", phon: "sor-t" }
+                ]
+            },
+            basics: {
+                title: "Phrases de base",
+                words: [
+                    { da: "Hvordan går det?", fr: "Comment ça va ?", phon: "vor-dan gor dé ?" },
+                    { da: "Det går godt", fr: "Ça va bien", phon: "dé gor got" },
+                    { da: "Hvad hedder du?", fr: "Comment t'appelles-tu ?", phon: "val hil-er dou ?" },
+                    { da: "Jeg hedder...", fr: "Je m'appelle...", phon: "yaï hil-er..." },
+                    { da: "Jeg forstår ikke", fr: "Je ne comprends pas", phon: "yaï for-stor i-ke" },
+                    { da: "Taler du fransk?", fr: "Parlez-vous français ?", phon: "ta-ler dou fransk ?" }
+                ]
+            }
+        };
+
+        // Extraction de tous les mots pour certaines fonctions
+        let allWordsList = [];
+        for (const key in vocabularyData) {
+            vocabularyData[key].words.forEach(word => {
+                allWordsList.push({ ...word, categoryKey: key, categoryName: vocabularyData[key].title });
+            });
+        }
+
+        // === GESTION DE LA NAVIGATION ===
+        function navigateTo(viewId) {
+            // Masquer toutes les vues
+            const views = ['view-dashboard', 'view-vocab', 'view-flashcards', 'view-quiz'];
+            views.forEach(id => {
+                document.getElementById(id).classList.add('hide');
+            });
+
+            // Afficher la vue ciblée
+            document.getElementById('view-' + viewId).classList.remove('hide');
+
+            // Initialiser les composants spécifiques
+            if (viewId === 'vocab') renderVocabulary();
+            if (viewId === 'flashcards') initFlashcards();
+            
+            // Fermer le menu mobile si ouvert
+            document.getElementById('mobile-menu').classList.add('hide');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hide');
+        }
+
+        // === LOGIQUE DU VOCABULAIRE ===
+        function renderVocabulary() {
+            const select = document.getElementById('vocab-category-select');
+            const selectedCat = select.value;
+            const listContainer = document.getElementById('vocab-list');
+            listContainer.innerHTML = '';
+
+            let wordsToRender = [];
+
+            if (selectedCat === 'all') {
+                wordsToRender = allWordsList;
+            } else {
+                wordsToRender = vocabularyData[selectedCat].words.map(w => ({
+                    ...w, 
+                    categoryName: vocabularyData[selectedCat].title
+                }));
+            }
+
+            wordsToRender.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group";
+                
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-1 h-full bg-[#C60C30] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-xl font-bold text-gray-900">${item.da}</h4>
+                            <span class="text-xs font-semibold bg-gray-100 text-gray-500 px-2 py-1 rounded-full uppercase tracking-wide">${item.categoryName || 'Mix'}</span>
+                        </div>
+                        <p class="text-gray-700 font-medium mb-3">${item.fr}</p>
+                        <div class="mt-auto pt-3 border-t border-gray-50 flex items-center text-sm text-gray-500">
+                            <i class="fas fa-volume-up mr-2 text-gray-400"></i>
+                            <span class="italic font-light">Prononciation:</span>
+                            <span class="ml-1 font-mono bg-gray-50 px-1 rounded">${item.phon}</span>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // === LOGIQUE DES FLASHCARDS ===
+        let currentFlashcardList = [];
+        let currentFlashcardIndex = 0;
+        let isFlipped = false;
+
+        function initFlashcards() {
+            const select = document.getElementById('flashcard-category-select');
+            const selectedCat = select.value;
+            
+            if (selectedCat === 'all') {
+                // Shuffle copy of all words
+                currentFlashcardList = [...allWordsList].sort(() => 0.5 - Math.random());
+            } else {
+                currentFlashcardList = [...vocabularyData[selectedCat].words].map(w => ({
+                    ...w, categoryName: vocabularyData[selectedCat].title
+                }));
+            }
+            
+            currentFlashcardIndex = 0;
+            isFlipped = false;
+            document.getElementById('flashcard-element').classList.remove('is-flipped');
+            updateFlashcardView();
+        }
+
+        function updateFlashcardView() {
+            if (currentFlashcardList.length === 0) return;
+            
+            const cardData = currentFlashcardList[currentFlashcardIndex];
+            
+            // Si la carte est retournée, on la remet à l'endroit sans animation d'abord (astuce UI)
+            if (isFlipped) {
+                isFlipped = false;
+                document.getElementById('flashcard-element').classList.remove('is-flipped');
+                setTimeout(() => setFlashcardContent(cardData), 300); // attendre fin anim CSS
+            } else {
+                setFlashcardContent(cardData);
+            }
+
+            document.getElementById('fc-counter').innerText = `${currentFlashcardIndex + 1} / ${currentFlashcardList.length}`;
+        }
+
+        function setFlashcardContent(cardData) {
+            document.getElementById('fc-da').innerText = cardData.da;
+            document.getElementById('fc-phon').innerText = `[ ${cardData.phon} ]`;
+            document.getElementById('fc-fr').innerText = cardData.fr;
+            document.getElementById('fc-cat').innerText = cardData.categoryName || 'Général';
+        }
+
+        function toggleFlashcard() {
+            isFlipped = !isFlipped;
+            const el = document.getElementById('flashcard-element');
+            if (isFlipped) {
+                el.classList.add('is-flipped');
+            } else {
+                el.classList.remove('is-flipped');
+            }
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcardIndex < currentFlashcardList.length - 1) {
+                currentFlashcardIndex++;
+                updateFlashcardView();
+            }
+        }
+
+        function prevFlashcard() {
+            if (currentFlashcardIndex > 0) {
+                currentFlashcardIndex--;
+                updateFlashcardView();
+            }
+        }
+
+        // === LOGIQUE DU QUIZ ===
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let isQuestionAnswered = false;
+
+        function startQuiz() {
+            // Setup UI
+            document.getElementById('quiz-intro').classList.add('hide');
+            document.getElementById('quiz-results').classList.add('hide');
+            document.getElementById('quiz-active').classList.remove('hide');
+            
+            // Generate 10 random questions
+            const shuffledWords = [...allWordsList].sort(() => 0.5 - Math.random());
+            const numQuestions = Math.min(10, shuffledWords.length);
+            
+            quizQuestions = [];
+            for (let i = 0; i < numQuestions; i++) {
+                const targetWord = shuffledWords[i];
+                
+                // Generer 3 fausses options
+                const falseOptions = [...allWordsList]
+                    .filter(w => w.fr !== targetWord.fr)
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 3)
+                    .map(w => w.fr);
+                
+                const options = [targetWord.fr, ...falseOptions].sort(() => 0.5 - Math.random());
+                
+                quizQuestions.push({
+                    word: targetWord.da,
+                    correctAnswer: targetWord.fr,
+                    options: options
+                });
+            }
+
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            updateQuizDisplay();
+        }
+
+        function updateQuizDisplay() {
+            isQuestionAnswered = false;
+            const q = quizQuestions[currentQuestionIndex];
+            
+            document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIndex + 1}/${quizQuestions.length}`;
+            document.getElementById('quiz-score-display').innerText = `Score: ${quizScore}`;
+            document.getElementById('quiz-question').innerText = q.word;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-option-btn bg-white border-2 border-gray-200 text-gray-700 font-semibold py-4 px-6 rounded-xl hover:border-[#C60C30] hover:bg-red-50 focus:outline-none transition-all text-lg w-full text-left";
+                btn.innerText = opt;
+                btn.onclick = () => handleQuizAnswer(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function handleQuizAnswer(selectedOption, buttonElement) {
+            if (isQuestionAnswered) return; // Empêcher multiple clics
+            isQuestionAnswered = true;
+
+            const q = quizQuestions[currentQuestionIndex];
+            const isCorrect = (selectedOption === q.correctAnswer);
+            
+            const feedbackEl = document.getElementById('quiz-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            // Désactiver tous les boutons et marquer la bonne réponse
+            const allBtns = document.querySelectorAll('.quiz-option-btn');
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-[#C60C30]', 'hover:bg-red-50', 'cursor-pointer');
+                
+                if (btn.innerText === q.correctAnswer) {
+                    btn.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                    // Icône de succès
+                    btn.innerHTML += ' <i class="fas fa-check-circle float-right mt-1"></i>';
+                } else if (btn === buttonElement && !isCorrect) {
+                    btn.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+                    // Icône d'erreur
+                    btn.innerHTML += ' <i class="fas fa-times-circle float-right mt-1"></i>';
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            if (isCorrect) {
+                quizScore++;
+                feedbackEl.innerText = "Bravo ! C'est la bonne réponse.";
+                feedbackEl.className = "mt-6 text-center h-8 font-bold text-lg text-green-600 block animate-fade-in";
+            } else {
+                feedbackEl.innerText = "Oups ! La bonne réponse était : " + q.correctAnswer;
+                feedbackEl.className = "mt-6 text-center h-8 font-bold text-lg text-red-600 block animate-fade-in";
+            }
+
+            document.getElementById('quiz-score-display').innerText = `Score: ${quizScore}`;
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                updateQuizDisplay();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-active').classList.add('hide');
+            document.getElementById('quiz-results').classList.remove('hide');
+            document.getElementById('final-score').innerText = `${quizScore}/${quizQuestions.length}`;
+            
+            // Confetti effect basic using css/html
+            const resultsDiv = document.getElementById('quiz-results');
+            if(quizScore >= 7) {
+                 resultsDiv.querySelector('.text-5xl').classList.add('text-green-500');
+                 resultsDiv.querySelector('.text-5xl').classList.remove('danish-text');
+            } else {
+                 resultsDiv.querySelector('.text-5xl').classList.add('danish-text');
+                 resultsDiv.querySelector('.text-5xl').classList.remove('text-green-500');
+            }
+        }
+
+        // Initialize default view
+        renderVocabulary();
+    </script>
+</body>
+</html>
