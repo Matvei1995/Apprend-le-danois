@@ -3,254 +3,843 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apprendre le Danois</title>
+    <title>DanskBabbel - Apprendre le Danois avec IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
-        .flashcard-inner { transition: transform 0.6s; }
-        .flipped .flashcard-inner { transform: rotateY(180deg); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F5F2; }
+        .babbel-orange { background-color: #FF5A00; }
+        .babbel-orange-text { color: #FF5A00; }
+        .babbel-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .babbel-card:hover { transform: translateY(-2px); }
+        .word-chip { user-select: none; transition: all 0.15s ease; }
+        .word-chip:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="text-slate-800 min-h-screen flex flex-col pb-20 md:pb-0">
 
-    <header class="bg-[#C60C30] text-white shadow-md">
-        <div class="max-w-4xl mx-auto px-4 py-6 text-center">
-            <h1 class="text-3xl font-bold mb-2">DanskLærer</h1>
-            <p class="text-sm opacity-90 mb-4">Progression : <span id="score-display" class="font-bold">0</span> mots maîtrisés</p>
-            
-            <!-- Sélecteur de Thème Global -->
-            <div class="mb-4 flex justify-center items-center space-x-2">
-                <label for="global-category" class="font-semibold text-sm">Thème :</label>
-                <select id="global-category" onchange="changeCategory(this.value)" class="p-2 rounded text-gray-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-white">
-                    <option value="Toutes">Tous les mots</option>
-                    <!-- Options injectées par JS -->
-                </select>
+    <!-- BARRE DE NAVIGATION PRINCIPALE -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl babbel-orange flex items-center justify-center text-white font-extrabold text-xl shadow-sm">D</div>
+                <span class="font-extrabold text-xl tracking-tight text-slate-900">dansk<span class="babbel-orange-text">+</span></span>
             </div>
 
-            <nav class="flex justify-center space-x-2 sm:space-x-4">
-                <button onclick="switchTab('vocab')" class="px-4 py-2 bg-white text-[#C60C30] rounded-md font-semibold shadow hover:bg-gray-100 transition">Lexique</button>
-                <button onclick="switchTab('flashcards')" class="px-4 py-2 bg-red-800 text-white rounded-md font-semibold shadow hover:bg-red-700 transition">Flashcards</button>
-                <button onclick="switchTab('quiz')" class="px-4 py-2 bg-red-800 text-white rounded-md font-semibold shadow hover:bg-red-700 transition">Quiz</button>
+            <!-- Navigation Desktop -->
+            <nav class="hidden md:flex items-center space-x-1">
+                <button onclick="switchMainView('courses')" id="nav-courses" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm bg-orange-50 text-[#FF5A00]">📚 Parcours</button>
+                <button onclick="switchMainView('ai-generator')" id="nav-ai-generator" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100">✨ Créateur IA</button>
+                <button onclick="switchMainView('ai-tutor')" id="nav-ai-tutor" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100">💬 Dialogue IA</button>
+                <button onclick="switchMainView('vocab')" id="nav-vocab" class="nav-btn px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100">🗂️ Lexique</button>
             </nav>
+
+            <!-- Statut IA & Score -->
+            <div class="flex items-center space-x-3">
+                <div id="ai-status-badge" onclick="switchMainView('ai-generator')" class="cursor-pointer flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                    <span id="ai-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span id="ai-status-text">IA locale</span>
+                </div>
+                <div class="flex items-center space-x-1 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                    <span>🔥</span>
+                    <span id="streak-score" class="font-extrabold text-xs text-amber-800">0</span>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-4xl mx-auto p-4 w-full mt-4">
-        
-        <div id="loader" class="flex flex-col items-center justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#C60C30] mb-4"></div>
-            <p class="text-gray-500 font-semibold animate-pulse">Chargement du vocabulaire...</p>
-        </div>
+    <!-- CONTENU PRINCIPAL -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-6">
 
-        <div id="app-content" class="hidden w-full">
-            <!-- MODULE LEXIQUE -->
-            <section id="vocab" class="tab-content block">
-                <div id="vocab-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-            </section>
+        <!-- VUE 1 : PARCOURS DE LEÇONS (STYLE BABBEL) -->
+        <section id="view-courses" class="main-view space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#FF5A00] bg-orange-50 px-2.5 py-1 rounded-md">Niveau A1 - A2</span>
+                        <span id="sync-badge" class="text-xs font-semibold text-slate-400">Synchronisation...</span>
+                    </div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 mt-2">Votre parcours danois</h1>
+                    <p class="text-slate-500 text-sm mt-1">Apprenez avec des dialogues concrets, de la grammaire expliquée et votre IA locale.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 shrink-0">
+                    <button onclick="exportLessonsJSON()" title="Télécharger le fichier pour le mettre sur GitHub" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl transition">
+                        📥 Exporter (danois-lessons-babbel.json)
+                    </button>
+                </div>
+            </div>
 
-            <!-- MODULE FLASHCARDS -->
-            <section id="flashcards" class="tab-content hidden flex flex-col items-center">
-                <div class="w-full max-w-md h-64 perspective-1000 cursor-pointer" onclick="flipCard()">
-                    <div id="flashcard-inner" class="flashcard-inner w-full h-full relative transform-style-3d shadow-xl rounded-xl">
-                        <div class="absolute w-full h-full bg-white backface-hidden rounded-xl flex flex-col items-center justify-center p-6 border-2 border-gray-100">
-                            <span id="fc-dk" class="text-4xl font-bold text-[#C60C30] mb-4 text-center"></span>
-                            <button onclick="event.stopPropagation(); speakDanish(document.getElementById('fc-dk').innerText)" class="mt-4 p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition">🔊 Écouter</button>
-                            <p class="text-gray-400 mt-4 text-sm">Cliquez pour voir la traduction</p>
-                        </div>
-                        <div class="absolute w-full h-full bg-gray-800 backface-hidden rounded-xl flex flex-col items-center justify-center p-6 text-white rotate-y-180">
-                            <span id="fc-fr" class="text-3xl font-bold mb-4 text-center"></span>
-                            <p id="fc-ex" class="text-center italic text-gray-300 px-4"></p>
-                        </div>
+            <!-- Filtre par thème sur le parcours -->
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-bold text-slate-600">Filtrer par thème :</span>
+                <select id="course-category-filter" onchange="renderCoursesGrid()" class="p-2 rounded-xl border border-slate-300 text-sm font-semibold bg-white focus:outline-none focus:border-[#FF5A00]">
+                    <option value="ALL">Tous les thèmes</option>
+                </select>
+            </div>
+
+            <div id="lessons-grid" class="grid grid-cols-1 gap-4">
+                <!-- Généré dynamiquement -->
+            </div>
+        </section>
+
+        <!-- VUE 2 : STUDIO IA LOCALE (GÉNÉRATEUR DE LEÇONS) -->
+        <section id="view-ai-generator" class="main-view hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900">✨ Générateur de Leçons (IA Locale)</h2>
+                        <p class="text-sm text-slate-500">Créez une leçon complète type Babbel sur mesure grâce à votre serveur Ollama.</p>
+                    </div>
+                    <button onclick="checkOllamaConnection()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700 transition">🔄 Tester connexion</button>
+                </div>
+
+                <!-- Configuration Ollama -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">URL du serveur local</label>
+                        <input id="ollama-url" type="text" value="http://localhost:11434" onchange="saveAiConfig()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:outline-none focus:border-[#FF5A00]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Modèle détecté</label>
+                        <select id="ollama-model" onchange="saveAiConfig()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium bg-white focus:outline-none focus:border-[#FF5A00]">
+                            <option value="llama3">llama3 (Par défaut)</option>
+                        </select>
                     </div>
                 </div>
-                <div class="mt-8 flex space-x-4">
-                    <button onclick="nextCard()" class="px-6 py-3 bg-[#C60C30] text-white rounded-lg font-bold shadow hover:bg-red-700 transition">Carte Suivante ➔</button>
-                </div>
-            </section>
 
-            <!-- MODULE QUIZ -->
-            <section id="quiz" class="tab-content hidden max-w-lg mx-auto w-full">
-                <div class="bg-white p-6 rounded-xl shadow-md w-full">
-                    <div class="flex justify-between items-center mb-6">
-                        <p id="quiz-question" class="text-2xl font-bold text-gray-800"></p>
-                        <button onclick="speakDanish(currentQuizWord.danois)" class="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">🔊</button>
+                <!-- Formulaire de création de cours -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Sujet de la leçon</label>
+                            <input id="lesson-topic" type="text" placeholder="Ex: Acheter des fruits au marché, Rendez-vous chez le médecin..." class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#FF5A00]">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Catégorie</label>
+                            <input id="lesson-cat" type="text" placeholder="Ex: Santé, Fruits, Tech..." class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#FF5A00]">
+                        </div>
                     </div>
-                    <div id="quiz-options" class="flex flex-col space-y-3"></div>
-                    <div id="quiz-feedback" class="mt-4 font-bold text-center hidden"></div>
-                    <button id="quiz-next-btn" onclick="generateQuiz()" class="mt-6 w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-bold hidden hover:bg-gray-300 transition">Question Suivante</button>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs text-slate-400 font-semibold self-center">Idées rapides :</span>
+                        <button onclick="setTopic('Acheter des fruits et légumes bio au supermarché', 'Fruits & Courses')" class="text-xs bg-orange-50 text-[#FF5A00] px-3 py-1.5 rounded-full font-semibold hover:bg-orange-100">🍎 Fruits & Courses</button>
+                        <button onclick="setTopic('Expliquer des symptômes à la pharmacie ou au médecin', 'Santé')" class="text-xs bg-orange-50 text-[#FF5A00] px-3 py-1.5 rounded-full font-semibold hover:bg-orange-100">🩺 Santé & Pharmacie</button>
+                        <button onclick="setTopic('Visiter un appartement à louer au Danemark', 'Expatriation & Animaux')" class="text-xs bg-orange-50 text-[#FF5A00] px-3 py-1.5 rounded-full font-semibold hover:bg-orange-100">🏡 Visiter un appartement</button>
+                        <button onclick="setTopic('Discuter d\'architecture logicielle et de développement web', 'Tech & Travail')" class="text-xs bg-orange-50 text-[#FF5A00] px-3 py-1.5 rounded-full font-semibold hover:bg-orange-100">💻 Tech & Code</button>
+                    </div>
+
+                    <button id="btn-generate-lesson" onclick="generateLessonWithAI()" class="w-full py-3.5 babbel-orange text-white font-extrabold rounded-xl shadow-md hover:opacity-95 transition flex items-center justify-center space-x-2">
+                        <span>Générer la leçon avec mon IA locale</span>
+                    </button>
+
+                    <div id="ai-gen-status" class="hidden p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm font-medium text-center animate-pulse">
+                        🧠 Votre IA locale rédige la leçon, les phrases de contexte et les notes grammaticales...
+                    </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+
+        <!-- VUE 3 : TUTEUR DIALOGUE IA (ROLEPLAY BABBEL LIVE) -->
+        <section id="view-ai-tutor" class="main-view hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[70vh]">
+                <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+                    <div>
+                        <h2 class="font-bold text-base">💬 Freja — Tutrice Danoise IA</h2>
+                        <p class="text-xs text-slate-400">Écrivez en danois (ou français). Elle vous répond et corrige vos fautes.</p>
+                    </div>
+                    <button onclick="resetChat()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg">Nouveau dialogue</button>
+                </div>
+
+                <div id="chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4 bg-slate-50"></div>
+
+                <div class="p-3 bg-white border-t border-slate-200 flex space-x-2">
+                    <input id="chat-input" type="text" onkeydown="if(event.key==='Enter') sendChatMessage()" placeholder="Écrivez en danois (ex: Hej, jeg hedder...)" class="flex-grow px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-[#FF5A00]">
+                    <button onclick="sendChatMessage()" class="px-5 py-2.5 babbel-orange text-white font-bold rounded-xl text-sm hover:opacity-95 transition">Envoyer</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VUE 4 : LEXIQUE COMPLET -->
+        <section id="view-vocab" class="main-view hidden space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <h2 class="text-xl font-extrabold text-slate-900">🗂️ Tout le vocabulaire des leçons</h2>
+                <select id="vocab-filter" onchange="renderVocabList()" class="p-2 rounded-xl border border-slate-300 text-sm font-semibold bg-white">
+                    <option value="ALL">Toutes les catégories</option>
+                </select>
+            </div>
+            <div id="vocab-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </section>
+
     </main>
 
+    <!-- LECTEUR DE LEÇON PLEIN ÉCRAN (L'EXPÉRIENCE BABBEL) -->
+    <div id="lesson-player" class="fixed inset-0 bg-[#F7F5F2] z-50 hidden flex-col">
+        <div class="bg-white border-b border-slate-200 px-4 h-16 flex items-center justify-between max-w-3xl w-full mx-auto md:mt-4 md:rounded-t-2xl">
+            <button onclick="closeLesson()" class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-lg">✕</button>
+            <div class="flex-grow mx-6 bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="lesson-progress-bar" class="babbel-orange h-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+            <span id="lesson-step-counter" class="text-xs font-extrabold text-slate-500">1/8</span>
+        </div>
+
+        <div class="flex-grow max-w-3xl w-full mx-auto bg-white md:mb-4 md:rounded-b-2xl shadow-sm flex flex-col justify-between p-6 overflow-y-auto">
+            <div id="exercise-container" class="my-auto py-4"></div>
+
+            <div id="exercise-footer" class="pt-4 border-t border-slate-100">
+                <div id="feedback-banner" class="hidden mb-4 p-4 rounded-xl font-bold text-sm flex items-center justify-between"></div>
+                <button id="btn-action-step" onclick="handleStepAction()" class="w-full py-4 babbel-orange text-white font-extrabold rounded-xl shadow-md hover:opacity-95 transition text-base">
+                    Continuer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION MOBILE BASSE -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 flex justify-around py-2 z-30">
+        <button onclick="switchMainView('courses')" class="flex flex-col items-center p-1 text-xs font-bold text-[#FF5A00]"><span>📚</span><span>Cours</span></button>
+        <button onclick="switchMainView('ai-generator')" class="flex flex-col items-center p-1 text-xs font-bold text-slate-500"><span>✨</span><span>Créer IA</span></button>
+        <button onclick="switchMainView('ai-tutor')" class="flex flex-col items-center p-1 text-xs font-bold text-slate-500"><span>💬</span><span>Tuteur</span></button>
+        <button onclick="switchMainView('vocab')" class="flex flex-col items-center p-1 text-xs font-bold text-slate-500"><span>🗂️</span><span>Lexique</span></button>
+    </nav>
+
     <script>
-        let allWords = []; 
-        let filteredWords = [];
-        let currentTab = 'vocab';
-        let masteredWords = parseInt(localStorage.getItem('danishMastered')) || 0;
-        document.getElementById('score-display').innerText = masteredWords;
+        // Leçons de secours si le fichier JSON n'est pas encore sur GitHub
+        const fallbackLessons = [
+            {
+                id: "lesson-1",
+                title: "Premiers pas & Présentations",
+                category: "Bases & Quotidien",
+                level: "A1.1",
+                description: "Saluer, se présenter et parler de son métier naturellement.",
+                items: [
+                    {
+                        danois: "Hej, jeg hedder Matvei",
+                        francais: "Bonjour, je m'appelle Matvei",
+                        exemple: "Hej, jeg hedder Matvei, og jeg kommer fra Frankrig.",
+                        exemple_fr: "Bonjour, je m'appelle Matvei et je viens de France.",
+                        note: "En danois, le verbe « hedde » signifie « s'appeler »."
+                    }
+                ]
+            }
+        ];
 
-        async function fetchVocabulary() {
+        let lessons = [];
+        let completedLessons = JSON.parse(localStorage.getItem('dansk_completed_lessons')) || [];
+        let streakScore = parseInt(localStorage.getItem('danishMastered')) || 0;
+        document.getElementById('streak-score').innerText = streakScore;
+
+        // ========================================================
+        // 1. CHARGEMENT AUTOMATIQUE DU FICHIER JSON + FUSION LOCALE
+        // ========================================================
+        async function loadAndSyncLessons() {
+            const syncBadge = document.getElementById('sync-badge');
+            let remoteLessons = [];
+            let localLessons = JSON.parse(localStorage.getItem('dansk_babbel_lessons')) || [];
+
             try {
-                const response = await fetch('danois-api.json');
-                if (!response.ok) throw new Error('Erreur HTTP');
-                
-                allWords = await response.json();
-                filteredWords = [...allWords]; // Par défaut, on prend tout
-                
-                populateCategories();
-                
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('hidden');
-                
-                renderApp();
-            } catch (error) {
-                console.error("Erreur API :", error);
-                document.getElementById('loader').innerHTML = '<p class="text-red-500 font-bold">Erreur de chargement (danois-api.json).</p>';
+                // On ajoute un timestamp pour éviter que le téléphone ne garde une vieille version en cache
+                const response = await fetch('danois-lessons-babbel.json?t=' + Date.now());
+                if (response.ok) {
+                    remoteLessons = await response.json();
+                    syncBadge.innerText = "✓ Synchronisé avec GitHub";
+                    syncBadge.className = "text-xs font-semibold text-emerald-600";
+                } else {
+                    throw new Error("Fichier non trouvé");
+                }
+            } catch (err) {
+                syncBadge.innerText = "Mode mémoire locale";
+                syncBadge.className = "text-xs font-semibold text-slate-400";
             }
-        }
 
-        function populateCategories() {
-            const select = document.getElementById('global-category');
-            const categories = [...new Set(allWords.map(w => w.cat))].sort();
-            categories.forEach(cat => {
-                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            // Fusion intelligente : on combine les leçons locales (créées par l'IA) et celles du fichier GitHub sans doublons
+            const mergedMap = new Map();
+            remoteLessons.forEach(l => mergedMap.set(l.id, l));
+            localLessons.forEach(l => {
+                if (!mergedMap.has(l.id)) {
+                    mergedMap.set(l.id, l);
+                }
             });
-        }
 
-        function changeCategory(category) {
-            if (category === "Toutes") {
-                filteredWords = [...allWords];
-            } else {
-                filteredWords = allWords.filter(w => w.cat === category);
+            lessons = Array.from(mergedMap.values());
+            if (lessons.length === 0) {
+                lessons = fallbackLessons;
             }
-            renderApp(); // Met à jour la vue active
+
+            localStorage.setItem('dansk_babbel_lessons', JSON.stringify(lessons));
+            populateCategoryFilters();
+            renderCoursesGrid();
         }
 
-        function renderApp() {
-            if (currentTab === 'vocab') initVocab();
-            if (currentTab === 'flashcards') nextCard();
-            if (currentTab === 'quiz') generateQuiz();
-        }
-
-        function switchTab(tabId) {
-            currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
+        function populateCategoryFilters() {
+            const categories = [...new Set(lessons.map(l => l.category))].sort();
             
-            const navButtons = document.querySelectorAll('nav button');
-            navButtons.forEach(btn => {
-                btn.classList.remove('bg-white', 'text-[#C60C30]');
-                btn.classList.add('bg-red-800', 'text-white');
-            });
-            event.currentTarget.classList.add('bg-white', 'text-[#C60C30]');
-            event.currentTarget.classList.remove('bg-red-800', 'text-white');
+            const courseSelect = document.getElementById('course-category-filter');
+            const currentCourseCat = courseSelect.value;
+            courseSelect.innerHTML = `<option value="ALL">Tous les thèmes (${lessons.length} leçons)</option>` +
+                categories.map(c => `<option value="${c}" ${currentCourseCat === c ? 'selected' : ''}>${c}</option>`).join('');
 
-            renderApp();
+            const vocabSelect = document.getElementById('vocab-filter');
+            const currentVocabCat = vocabSelect.value;
+            vocabSelect.innerHTML = `<option value="ALL">Toutes les catégories</option>` +
+                categories.map(c => `<option value="${c}" ${currentVocabCat === c ? 'selected' : ''}>${c}</option>`).join('');
         }
 
+        // ==========================================
+        // 2. SYNTHÈSE VOCALE DANOISE
+        // ==========================================
         function speakDanish(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'da-DK'; 
-                utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-            }
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'da-DK';
+            utterance.rate = 0.88;
+            const voices = window.speechSynthesis.getVoices();
+            const danishVoice = voices.find(v => v.lang.includes('da'));
+            if (danishVoice) utterance.voice = danishVoice;
+            window.speechSynthesis.speak(utterance);
         }
 
-        function initVocab() {
-            const container = document.getElementById('vocab-list');
-            container.innerHTML = ''; 
-            filteredWords.forEach(word => {
-                container.innerHTML += `
-                    <div class="bg-white p-5 rounded-xl shadow border-l-4 border-[#C60C30] flex flex-col justify-between hover:shadow-md transition">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-bold text-gray-800">${word.danois}</h3>
-                                <button onclick="speakDanish('${word.danois.replace(/'/g, "\\'")}')" class="text-xl p-1 hover:scale-110 transition">🔊</button>
-                            </div>
-                            <p class="text-md text-gray-600 font-semibold mb-3">${word.francais}</p>
-                            <p class="text-sm text-gray-500 italic bg-gray-50 p-2 rounded">${word.exemple}</p>
+        // ==========================================
+        // 3. MOTEUR DE LEÇON INTERACTIF (BABBEL FLOW)
+        // ==========================================
+        let activeLesson = null;
+        let lessonSteps = [];
+        let currentStepIndex = 0;
+        let stepValidated = false;
+        let selectedWordsBuilder = [];
+
+        function startLesson(lessonId) {
+            activeLesson = lessons.find(l => l.id === lessonId);
+            if (!activeLesson) return;
+
+            lessonSteps = [];
+            activeLesson.items.forEach(item => {
+                lessonSteps.push({ type: 'discovery', item });
+                lessonSteps.push({ type: 'qcm', item });
+            });
+            activeLesson.items.forEach(item => {
+                lessonSteps.push({ type: 'builder', item });
+            });
+            activeLesson.items.forEach(item => {
+                lessonSteps.push({ type: 'dialogue', item });
+            });
+
+            currentStepIndex = 0;
+            document.getElementById('lesson-player').classList.remove('hidden');
+            document.getElementById('lesson-player').classList.add('flex');
+            renderCurrentStep();
+        }
+
+        function closeLesson() {
+            document.getElementById('lesson-player').classList.add('hidden');
+            document.getElementById('lesson-player').classList.remove('flex');
+        }
+
+        function renderCurrentStep() {
+            stepValidated = false;
+            const container = document.getElementById('exercise-container');
+            const banner = document.getElementById('feedback-banner');
+            const actionBtn = document.getElementById('btn-action-step');
+            banner.classList.add('hidden');
+
+            const pct = Math.round(((currentStepIndex + 1) / lessonSteps.length) * 100);
+            document.getElementById('lesson-progress-bar').style.width = `${pct}%`;
+            document.getElementById('lesson-step-counter').innerText = `${currentStepIndex + 1}/${lessonSteps.length}`;
+
+            const step = lessonSteps[currentStepIndex];
+
+            if (step.type === 'discovery') {
+                stepValidated = true;
+                actionBtn.innerText = "Compris, continuer";
+                actionBtn.className = "w-full py-4 babbel-orange text-white font-extrabold rounded-xl shadow-md hover:opacity-95 transition";
+                
+                speakDanish(step.item.danois);
+
+                container.innerHTML = `
+                    <div class="text-center space-y-6 max-w-lg mx-auto">
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-[#FF5A00] bg-orange-50 px-3 py-1 rounded-full">Nouvelle expression</span>
+                        
+                        <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <button onclick="speakDanish('${step.item.danois.replace(/'/g, "\\'")}')" class="w-14 h-14 rounded-full babbel-orange text-white text-2xl mx-auto flex items-center justify-center shadow-md hover:scale-105 transition mb-4">🔊</button>
+                            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">${step.item.danois}</h2>
+                            <p class="text-lg font-semibold text-slate-500">${step.item.francais}</p>
                         </div>
-                        <span class="inline-block mt-3 px-2 py-1 bg-gray-100 text-xs text-gray-500 rounded-full self-start">${word.cat}</span>
+
+                        <div class="text-left p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-slate-400 uppercase">En contexte</span>
+                                <button onclick="speakDanish('${step.item.exemple.replace(/'/g, "\\'")}')" class="text-sm text-[#FF5A00] font-bold">🔊 Écouter la phrase</button>
+                            </div>
+                            <p class="font-bold text-slate-800">${step.item.exemple}</p>
+                            <p class="text-sm text-slate-500 mt-1">${step.item.exemple_fr || ''}</p>
+                        </div>
+
+                        ${step.item.note ? `
+                        <div class="text-left p-4 bg-amber-50/90 border border-amber-200 rounded-xl flex items-start space-x-3">
+                            <span class="text-xl">💡</span>
+                            <div>
+                                <h4 class="text-xs font-extrabold uppercase text-amber-900 mb-0.5">Astuce Babbel</h4>
+                                <p class="text-sm text-amber-900/90 leading-relaxed">${step.item.note}</p>
+                            </div>
+                        </div>` : ''}
                     </div>
                 `;
-            });
-        }
-
-        function flipCard() {
-            document.getElementById('flashcard-inner').parentNode.classList.toggle('flipped');
-        }
-
-        function nextCard() {
-            document.getElementById('flashcard-inner').parentNode.classList.remove('flipped');
-            setTimeout(() => {
-                const randIndex = Math.floor(Math.random() * filteredWords.length);
-                const word = filteredWords[randIndex];
-                document.getElementById('fc-dk').innerText = word.danois;
-                document.getElementById('fc-fr').innerText = word.francais;
-                document.getElementById('fc-ex').innerText = word.exemple;
-            }, 150);
-        }
-
-        let currentQuizWord;
-        function generateQuiz() {
-            document.getElementById('quiz-feedback').classList.add('hidden');
-            document.getElementById('quiz-next-btn').classList.add('hidden');
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-
-            // Sélectionne un mot aléatoire dans la liste filtrée
-            currentQuizWord = filteredWords[Math.floor(Math.random() * filteredWords.length)];
-            document.getElementById('quiz-question').innerText = `Que signifie "${currentQuizWord.danois}" ?`;
-
-            let options = [currentQuizWord];
-            while (options.length < 3) {
-                // Les mauvaises réponses peuvent venir de toute la base pour éviter que ce soit trop facile
-                let randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-                if (!options.includes(randomWord)) options.push(randomWord);
             }
-            options.sort(() => Math.random() - 0.5);
 
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full py-3 px-4 bg-gray-50 border-2 border-gray-200 rounded-lg text-left font-semibold hover:bg-gray-100 transition';
-                btn.innerText = opt.francais;
-                btn.onclick = () => checkAnswer(opt, btn);
-                optionsContainer.appendChild(btn);
-            });
+            else if (step.type === 'qcm') {
+                actionBtn.innerText = "Sélectionnez une réponse";
+                actionBtn.className = "w-full py-4 bg-slate-200 text-slate-500 font-extrabold rounded-xl cursor-not-allowed";
+
+                let allItems = lessons.flatMap(l => l.items);
+                let options = [step.item];
+                while (options.length < Math.min(3, allItems.length)) {
+                    let rnd = allItems[Math.floor(Math.random() * allItems.length)];
+                    if (!options.some(o => o.danois === rnd.danois)) options.push(rnd);
+                }
+                options.sort(() => Math.random() - 0.5);
+
+                container.innerHTML = `
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <p class="text-sm font-bold text-slate-400 uppercase text-center">Choisissez la bonne traduction</p>
+                        <div class="text-center p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h3 class="text-2xl font-extrabold text-slate-900">${step.item.francais}</h3>
+                        </div>
+                        <div class="space-y-3" id="qcm-list">
+                            ${options.map(opt => `
+                                <button onclick="validateQCM('${opt.danois.replace(/'/g, "\\'")}', this)" class="w-full p-4 rounded-xl border-2 border-slate-200 text-left font-bold text-slate-800 hover:border-[#FF5A00] hover:bg-orange-50/30 transition flex justify-between items-center">
+                                    <span>${opt.danois}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            else if (step.type === 'builder') {
+                selectedWordsBuilder = [];
+                actionBtn.innerText = "Vérifier";
+                actionBtn.className = "w-full py-4 babbel-orange text-white font-extrabold rounded-xl shadow-md";
+
+                const cleanSentence = step.item.danois.replace(/[.,?!]/g, '');
+                const wordsArray = cleanSentence.split(' ').sort(() => Math.random() - 0.5);
+
+                container.innerHTML = `
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <p class="text-sm font-bold text-slate-400 uppercase text-center">Traduisez cette phrase en assemblant les mots</p>
+                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+                            <p class="text-xl font-extrabold text-slate-900">${step.item.francais}</p>
+                        </div>
+
+                        <div id="builder-dropzone" class="min-h-[68px] p-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/50 flex flex-wrap gap-2 items-center">
+                            <span id="builder-placeholder" class="text-sm text-slate-400 mx-auto">Cliquez sur les mots ci-dessous pour former la phrase...</span>
+                        </div>
+
+                        <div id="builder-bank" class="flex flex-wrap gap-2 justify-center pt-2">
+                            ${wordsArray.map(w => `
+                                <button onclick="toggleBuilderWord(this, '${w.replace(/'/g, "\\'")}')" data-word="${w}" class="word-chip px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-800 shadow-sm hover:border-slate-400">
+                                    ${w}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            else if (step.type === 'dialogue') {
+                actionBtn.innerText = "Vérifier";
+                actionBtn.className = "w-full py-4 babbel-orange text-white font-extrabold rounded-xl shadow-md";
+
+                const words = step.item.danois.split(' ');
+                const missingWord = words[words.length - 1].replace(/[.,?!]/g, '');
+                const sentenceWithBlank = step.item.danois.replace(missingWord, '_______');
+
+                container.innerHTML = `
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <p class="text-sm font-bold text-slate-400 uppercase text-center">Complétez le dialogue en danois</p>
+                        
+                        <div class="space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-sm">🇩🇰</div>
+                                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 text-sm">
+                                    <p class="font-bold text-slate-700">${step.item.francais}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start justify-end space-x-3 pt-2">
+                                <div class="bg-orange-50 border border-orange-200 p-4 rounded-2xl rounded-tr-none text-right">
+                                    <p class="font-extrabold text-lg text-slate-900">${sentenceWithBlank}</p>
+                                    <p class="text-xs text-slate-500 mt-1">${step.item.exemple}</p>
+                                </div>
+                                <div class="w-8 h-8 rounded-full babbel-orange text-white flex items-center justify-center text-xs font-bold">Vous</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Tapez le mot manquant :</label>
+                            <input id="dialogue-input" type="text" data-answer="${missingWord}" autocomplete="off" placeholder="Écrivez ici..." class="w-full px-4 py-3.5 rounded-xl border-2 border-slate-300 font-bold text-lg focus:outline-none focus:border-[#FF5A00]">
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => document.getElementById('dialogue-input')?.focus(), 100);
+            }
         }
 
-        function checkAnswer(selectedOpt, btn) {
-            const feedback = document.getElementById('quiz-feedback');
-            const options = document.getElementById('quiz-options').children;
-            
-            Array.from(options).forEach(b => b.disabled = true);
+        function validateQCM(chosenDanish, btnElement) {
+            if (stepValidated) return;
+            stepValidated = true;
+            const step = lessonSteps[currentStepIndex];
+            const isCorrect = chosenDanish === step.item.danois;
 
-            if (selectedOpt.danois === currentQuizWord.danois) {
-                btn.classList.replace('border-gray-200', 'border-green-500');
-                btn.classList.add('bg-green-50', 'text-green-700');
-                feedback.innerText = "Korrekt !";
-                feedback.className = "mt-4 font-bold text-center text-green-600 block";
-                speakDanish('Korrekt');
-                
-                masteredWords++;
-                localStorage.setItem('danishMastered', masteredWords);
-                document.getElementById('score-display').innerText = masteredWords;
+            speakDanish(step.item.danois);
+            showFeedback(isCorrect, step.item.danois);
+
+            if (isCorrect) {
+                btnElement.classList.replace('border-slate-200', 'border-emerald-500');
+                btnElement.classList.add('bg-emerald-50', 'text-emerald-800');
             } else {
-                btn.classList.replace('border-gray-200', 'border-red-500');
-                btn.classList.add('bg-red-50', 'text-red-700');
-                feedback.innerText = `Forkert. La bonne réponse : ${currentQuizWord.francais}`;
-                feedback.className = "mt-4 font-bold text-center text-red-600 block";
-                speakDanish(currentQuizWord.danois);
+                btnElement.classList.replace('border-slate-200', 'border-rose-500');
+                btnElement.classList.add('bg-rose-50', 'text-rose-800');
             }
-            document.getElementById('quiz-next-btn').classList.remove('hidden');
         }
 
-        fetchVocabulary();
+        function toggleBuilderWord(btn, word) {
+            if (stepValidated) return;
+            const dropzone = document.getElementById('builder-dropzone');
+            const bank = document.getElementById('builder-bank');
+            const placeholder = document.getElementById('builder-placeholder');
+            if (placeholder) placeholder.remove();
+
+            if (btn.parentElement.id === 'builder-bank') {
+                dropzone.appendChild(btn);
+                selectedWordsBuilder.push(word);
+                speakDanish(word);
+            } else {
+                bank.appendChild(btn);
+                const idx = selectedWordsBuilder.indexOf(word);
+                if (idx > -1) selectedWordsBuilder.splice(idx, 1);
+            }
+        }
+
+        function showFeedback(isCorrect, correctAnswerText) {
+            const banner = document.getElementById('feedback-banner');
+            const actionBtn = document.getElementById('btn-action-step');
+            banner.classList.remove('hidden');
+
+            if (isCorrect) {
+                streakScore++;
+                localStorage.setItem('danishMastered', streakScore);
+                document.getElementById('streak-score').innerText = streakScore;
+                banner.className = "mb-4 p-4 rounded-xl font-bold text-sm bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between";
+                banner.innerHTML = `<span>✅ Rigtigt ! Excellente réponse.</span> <button onclick="speakDanish('${correctAnswerText.replace(/'/g, "\\'")}')" class="underline">🔊 Réécouter</button>`;
+            } else {
+                banner.className = "mb-4 p-4 rounded-xl font-bold text-sm bg-rose-50 border border-rose-200 text-rose-800 flex items-center justify-between";
+                banner.innerHTML = `<span>❌ Réponse attendue : <u>${correctAnswerText}</u></span> <button onclick="speakDanish('${correctAnswerText.replace(/'/g, "\\'")}')" class="underline">🔊 Écouter</button>`;
+            }
+
+            actionBtn.innerText = currentStepIndex + 1 < lessonSteps.length ? "Continuer" : "Terminer la leçon 🎉";
+            actionBtn.className = "w-full py-4 babbel-orange text-white font-extrabold rounded-xl shadow-md hover:opacity-95 transition";
+        }
+
+        function handleStepAction() {
+            const step = lessonSteps[currentStepIndex];
+
+            if (!stepValidated) {
+                if (step.type === 'builder') {
+                    stepValidated = true;
+                    const userAttempt = selectedWordsBuilder.join(' ').toLowerCase().trim();
+                    const expected = step.item.danois.replace(/[.,?!]/g, '').toLowerCase().trim();
+                    speakDanish(step.item.danois);
+                    showFeedback(userAttempt === expected, step.item.danois);
+                    return;
+                }
+                if (step.type === 'dialogue') {
+                    const input = document.getElementById('dialogue-input');
+                    if (!input) return;
+                    stepValidated = true;
+                    const userWord = input.value.trim().toLowerCase();
+                    const expectedWord = input.dataset.answer.trim().toLowerCase();
+                    speakDanish(step.item.danois);
+                    showFeedback(userWord === expectedWord, step.item.danois);
+                    return;
+                }
+                return;
+            }
+
+            if (currentStepIndex + 1 < lessonSteps.length) {
+                currentStepIndex++;
+                renderCurrentStep();
+            } else {
+                if (!completedLessons.includes(activeLesson.id)) {
+                    completedLessons.push(activeLesson.id);
+                    localStorage.setItem('dansk_completed_lessons', JSON.stringify(completedLessons));
+                }
+                closeLesson();
+                renderCoursesGrid();
+            }
+        }
+
+        // ==========================================
+        // 4. CONNEXION IA LOCALE (OLLAMA)
+        // ==========================================
+        function getOllamaConfig() {
+            return {
+                url: localStorage.getItem('ollama_url') || 'http://localhost:11434',
+                model: localStorage.getItem('ollama_model') || 'llama3'
+            };
+        }
+
+        function saveAiConfig() {
+            localStorage.setItem('ollama_url', document.getElementById('ollama-url').value.trim());
+            localStorage.setItem('ollama_model', document.getElementById('ollama-model').value);
+            checkOllamaConnection();
+        }
+
+        async function checkOllamaConnection() {
+            const cfg = getOllamaConfig();
+            document.getElementById('ollama-url').value = cfg.url;
+            const dot = document.getElementById('ai-dot');
+            const txt = document.getElementById('ai-status-text');
+            const select = document.getElementById('ollama-model');
+
+            try {
+                const res = await fetch(`${cfg.url}/api/tags`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                txt.innerText = "IA Locale Connectée";
+
+                if (data.models && data.models.length > 0) {
+                    select.innerHTML = data.models.map(m => `<option value="${m.name}" ${m.name === cfg.model ? 'selected' : ''}>${m.name}</option>`).join('');
+                    localStorage.setItem('ollama_model', select.value);
+                }
+            } catch (e) {
+                dot.className = "w-2 h-2 rounded-full bg-rose-400";
+                txt.innerText = "IA Hors-ligne";
+            }
+        }
+
+        function setTopic(t, cat) {
+            document.getElementById('lesson-topic').value = t;
+            document.getElementById('lesson-cat').value = cat || 'Vie quotidienne';
+        }
+
+        async function generateLessonWithAI() {
+            const topic = document.getElementById('lesson-topic').value.trim();
+            const cat = document.getElementById('lesson-cat').value.trim() || 'Vie quotidienne';
+            if (!topic) return alert("Veuillez entrer un sujet de leçon.");
+
+            const cfg = getOllamaConfig();
+            const btn = document.getElementById('btn-generate-lesson');
+            const status = document.getElementById('ai-gen-status');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            status.classList.remove('hidden');
+
+            const prompt = `Tu es un professeur de danois expert pour francophones (méthode Babbel).
+Crée une leçon de danois pratique sur le sujet : "${topic}" dans la catégorie "${cat}".
+Réponds UNIQUEMENT avec un objet JSON valide suivant strictement cette structure, sans texte autour :
+{
+  "title": "Titre court de la leçon en français",
+  "category": "${cat}",
+  "level": "A1/A2",
+  "description": "Courte description en français",
+  "items": [
+    {
+      "danois": "Expression ou courte phrase en danois (3 à 6 mots)",
+      "francais": "Traduction en français",
+      "exemple": "Phrase complète d'exemple en danois",
+      "exemple_fr": "Traduction de l'exemple en français",
+      "note": "Explication grammaticale, prononciation ou astuce culturelle danoise en français"
+    }
+  ]
+}
+Génère exactement 4 éléments dans "items". Assure-toi que le danois est naturel et idiomatique.`;
+
+            try {
+                const response = await fetch(`${cfg.url}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: document.getElementById('ollama-model').value || cfg.model,
+                        prompt: prompt,
+                        format: "json",
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) throw new Error("Erreur de communication avec Ollama");
+                const data = await response.json();
+                const generatedLesson = JSON.parse(data.response);
+
+                generatedLesson.id = "ai-lesson-" + Date.now();
+                generatedLesson.category = cat;
+                lessons.unshift(generatedLesson);
+                localStorage.setItem('dansk_babbel_lessons', JSON.stringify(lessons));
+
+                populateCategoryFilters();
+                renderCoursesGrid();
+                switchMainView('courses');
+                startLesson(generatedLesson.id);
+            } catch (err) {
+                alert("Impossible de joindre votre IA locale. Vérifiez qu'Ollama est lancé avec OLLAMA_ORIGINS=\"*\"");
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                status.classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // 5. TUTEUR CONVERSATIONNEL IA (ROLEPLAY)
+        // ==========================================
+        let chatHistory = [];
+
+        function resetChat() {
+            chatHistory = [
+                { role: 'assistant', content: "Hej! Jeg hedder Freja. Hvordan går det i dag? (Bonjour ! Je m'appelle Freja. Comment ça va aujourd'hui ?)" }
+            ];
+            renderChat();
+        }
+
+        function renderChat() {
+            const box = document.getElementById('chat-messages');
+            box.innerHTML = chatHistory.map(m => {
+                if (m.role === 'assistant') {
+                    return `
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-full babbel-orange text-white flex items-center justify-center font-bold text-xs shrink-0">DK</div>
+                            <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-slate-200 text-sm max-w-md shadow-sm">
+                                <p class="text-slate-800 whitespace-pre-line">${m.content}</p>
+                                <button onclick="speakDanish('${m.content.split('(')[0].replace(/'/g, "\\'")}')" class="text-xs text-[#FF5A00] font-bold mt-2">🔊 Écouter</button>
+                            </div>
+                        </div>`;
+                } else {
+                    return `
+                        <div class="flex items-start justify-end space-x-3">
+                            <div class="bg-slate-900 text-white p-3.5 rounded-2xl rounded-tr-none text-sm max-w-md">
+                                <p>${m.content}</p>
+                            </div>
+                        </div>`;
+                }
+            }).join('');
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            chatHistory.push({ role: 'user', content: text });
+            renderChat();
+
+            const cfg = getOllamaConfig();
+            try {
+                const res = await fetch(`${cfg.url}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: document.getElementById('ollama-model').value || cfg.model,
+                        stream: false,
+                        messages: [
+                            {
+                                role: "system",
+                                content: "Tu es Freja, une tutrice danoise bienveillante. Réponds en danois simple (niveau A1/A2) suivi de la traduction française entre parenthèses. Si l'utilisateur fait une erreur en danois, ajoute une courte note '💡 Correction :' en français."
+                            },
+                            ...chatHistory
+                        ]
+                    })
+                });
+                const data = await res.json();
+                chatHistory.push({ role: 'assistant', content: data.message.content });
+                renderChat();
+            } catch (e) {
+                chatHistory.push({ role: 'assistant', content: "⚠️ Erreur de connexion à votre IA locale (Ollama)." });
+                renderChat();
+            }
+        }
+
+        // ==========================================
+        // 6. RENDU INTERFACE & EXPORT JSON
+        // ==========================================
+        function switchMainView(viewName) {
+            document.querySelectorAll('.main-view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.className = "nav-btn px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:bg-slate-100";
+            });
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if (activeNav) activeNav.className = "nav-btn px-4 py-2 rounded-lg font-bold text-sm bg-orange-50 text-[#FF5A00]";
+
+            if (viewName === 'vocab') renderVocabList();
+        }
+
+        function renderCoursesGrid() {
+            const grid = document.getElementById('lessons-grid');
+            const selectedCat = document.getElementById('course-category-filter').value;
+            const filtered = selectedCat === 'ALL' ? lessons : lessons.filter(l => l.category === selectedCat);
+
+            grid.innerHTML = filtered.map((lesson, index) => {
+                const isDone = completedLessons.includes(lesson.id);
+                return `
+                    <div class="babbel-card bg-white rounded-2xl p-5 shadow-sm border ${isDone ? 'border-emerald-300' : 'border-slate-200'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 rounded-2xl ${isDone ? 'bg-emerald-500 text-white' : 'bg-orange-50 text-[#FF5A00]'} flex items-center justify-center font-extrabold text-lg shrink-0">
+                                ${isDone ? '✓' : index + 1}
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-extrabold uppercase text-[#FF5A00]">${lesson.category}</span>
+                                    <span class="text-xs text-slate-400">• Niveau ${lesson.level || 'A1'}</span>
+                                </div>
+                                <h3 class="text-lg font-extrabold text-slate-900 mt-0.5">${lesson.title}</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">${lesson.description}</p>
+                            </div>
+                        </div>
+                        <button onclick="startLesson('${lesson.id}')" class="w-full sm:w-auto px-6 py-3 ${isDone ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'babbel-orange text-white'} font-extrabold text-sm rounded-xl transition shrink-0">
+                            ${isDone ? 'Réviser la leçon' : 'Commencer ➔'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderVocabList() {
+            const selectedCat = document.getElementById('vocab-filter').value;
+            const filteredLessons = selectedCat === 'ALL' ? lessons : lessons.filter(l => l.category === selectedCat);
+            const items = filteredLessons.flatMap(l => l.items.map(it => ({ ...it, cat: l.category })));
+
+            document.getElementById('vocab-grid').innerHTML = items.map(item => `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-orange-50 text-[#FF5A00] rounded-md">${item.cat}</span>
+                        <h4 class="font-extrabold text-slate-900 text-lg mt-1">${item.danois}</h4>
+                        <p class="text-sm font-semibold text-slate-600 mb-2">${item.francais}</p>
+                        <p class="text-xs text-slate-500 italic">${item.exemple}</p>
+                    </div>
+                    <button onclick="speakDanish('${item.danois.replace(/'/g, "\\'")}')" class="p-2 bg-slate-100 rounded-full hover:bg-orange-50 shrink-0">🔊</button>
+                </div>
+            `).join('');
+        }
+
+        function exportLessonsJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(lessons, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "danois-lessons-babbel.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        // Initialisation au chargement
+        loadAndSyncLessons();
+        resetChat();
+        checkOllamaConnection();
     </script>
 </body>
 </html>

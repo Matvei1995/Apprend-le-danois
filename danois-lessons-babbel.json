@@ -1,0 +1,166 @@
+[
+  {
+    "id": "lesson-1",
+    "title": "Premiers pas & Présentations",
+    "category": "Bases & Quotidien",
+    "level": "A1.1",
+    "description": "Saluer, se présenter et parler de son métier naturellement.",
+    "items": [
+      {
+        "danois": "Hej, jeg hedder Matvei",
+        "francais": "Bonjour, je m'appelle Matvei",
+        "exemple": "Hej, jeg hedder Matvei, og jeg kommer fra Frankrig.",
+        "exemple_fr": "Bonjour, je m'appelle Matvei et je viens de France.",
+        "note": "En danois, le verbe « hedde » signifie littéralement « s'appeler ». Le 'd' de 'hedder' est doux (comme le 'th' anglais dans 'the')."
+      },
+      {
+        "danois": "Jeg arbejder som webudvikler",
+        "francais": "Je travaille comme développeur web",
+        "exemple": "Hvad laver du? Jeg arbejder som webudvikler.",
+        "exemple_fr": "Que fais-tu dans la vie ? Je travaille comme développeur web.",
+        "note": "Pas d'article devant les professions en danois ! On dit « som webudvikler » et non « som en webudvikler »."
+      },
+      {
+        "danois": "Tak for i dag",
+        "francais": "Merci pour aujourd'hui",
+        "exemple": "Det var hyggeligt! Tak for i dag.",
+        "exemple_fr": "C'était très sympa ! Merci pour aujourd'hui.",
+        "note": "Expression culturelle incontournable au Danemark : on la dit en quittant le travail, des amis ou après un rendez-vous."
+      }
+    ]
+  },
+  {
+    "id": "lesson-2",
+    "title": "S'installer au Danemark & Vie pratique",
+    "category": "Expatriation & Animaux",
+    "level": "A1.2",
+    "description": "Chercher un logement, démarches à la Kommune et vie avec son chien.",
+    "items": [
+      {
+        "danois": "Vi leder efter en lejlighed",
+        "francais": "Nous cherchons un appartement",
+        "exemple": "Vi leder efter en lys lejlighed, hvor hunde er tilladt.",
+        "exemple_fr": "Nous cherchons un appartement lumineux où les chiens sont autorisés.",
+        "note": "Le verbe « at lede efter » signifie « chercher ». Attention aux genres : « en lejlighed » (genre commun) vs « et hus » (genre neutre)."
+      },
+      {
+        "danois": "Min hund er meget rolig",
+        "francais": "Mon chien est très calme",
+        "exemple": "Bare rolig, min hund er meget rolig og venlig.",
+        "exemple_fr": "Pas d'inquiétude, mon chien est très calme et amical.",
+        "note": "« Bare rolig » est une expression très courante qui veut dire « Ne t'inquiète pas / Sois tranquille »."
+      },
+      {
+        "danois": "Jeg skal gå en tur med hunden",
+        "francais": "Je dois promener le chien",
+        "exemple": "Jeg skal ud at gå en tur med hunden i parken.",
+        "exemple_fr": "Je dois sortir promener le chien dans le parc.",
+        "note": "En danois, l'article défini (« le ») se colle à la fin du mot : « en hund » (un chien) devient « hunden » (le chien)."
+      },
+      {
+        "danois": "Jeg skal have et CPR-nummer",
+        "francais": "Je dois obtenir un numéro CPR",
+        "exemple": "Jeg har en aftale hos kommunen for at få et CPR-nummer.",
+        "exemple_fr": "J'ai rendez-vous à la mairie pour obtenir un numéro CPR.",
+        "note": "Le CPR-nummer est le numéro d'identification personnelle indispensable pour tout au Danemark (banque, médecin, salle de sport)."
+      }
+    ]
+  },
+  {
+    "id": "lesson-3",
+    "title": "Alimentation, Café & Sport",
+    "category": "Mode de vie",
+    "level": "A1.3",
+    "description": "Commander végan/sans gluten, acheter du café et aller à la salle.",
+    "items": [
+      {
+        "danois": "Har I veganske muligheder?",
+        "francais": "Avez-vous des options véganes ?",
+        "exemple": "Undskyld, jeg er vegetar. Har I veganske muligheder på menuen?",
+        "exemple_fr": "Excusez-moi, je suis végétarien. Avez-vous des options véganes au menu ?",
+        "note": "En danois, « I » (toujours avec une majuscule) correspond au « vous » pluriel, utilisé quand on s'adresse à un restaurant ou une boutique."
+      },
+      {
+        "danois": "Er det uden gluten og uden æg?",
+        "francais": "Est-ce sans gluten et sans œufs ?",
+        "exemple": "Denne kage ser god ud, men er det uden gluten og uden æg?",
+        "exemple_fr": "Ce gâteau a l'air bon, mais est-ce sans gluten et sans œufs ?",
+        "note": "« Uden » signifie « sans » et se prononce avec le 'd' doux danois. « Æg » se prononce presque comme 'ègue'."
+      },
+      {
+        "danois": "Hvor kan jeg købe kaffebønner?",
+        "francais": "Où puis-je acheter des grains de café ?",
+        "exemple": "Hvor kan jeg købe gode kaffebønner til min espressomaskine?",
+        "exemple_fr": "Où puis-je acheter de bons grains de café pour ma machine à expresso ?",
+        "note": "Après une question commençant par un mot interrogatif (Hvor = Où), le verbe (« kan ») vient toujours avant le sujet (« jeg »)."
+      },
+      {
+        "danois": "Jeg dyrker styrketræning",
+        "francais": "Je fais de la musculation",
+        "exemple": "Jeg dyrker styrketræning i fitnesscenteret fire gange om ugen.",
+        "exemple_fr": "Je fais de la musculation à la salle de sport quatre fois par semaine.",
+        "note": "Pour le sport ou une activité régulière, les Danois utilisent le verbe « at dyrke » (littéralement cultiver/pratiquer)."
+      }
+    ]
+  },
+  {
+    "id": "lesson-4",
+    "title": "Les Fruits & Au Supermarché",
+    "category": "Fruits & Courses",
+    "level": "A1.4",
+    "description": "Faire ses courses, reconnaître les fruits et cuisiner.",
+    "items": [
+      {
+        "danois": "Jeg spiser et æble hver dag",
+        "francais": "Je mange une pomme tous les jours",
+        "exemple": "Jeg køber frisk frugt og spiser et æble hver dag.",
+        "exemple_fr": "J'achète des fruits frais et je mange une pomme tous les jours.",
+        "note": "« Æble » est un mot neutre, on utilise donc l'article « et » (et æble). Au défini, cela devient « æblet » (la pomme)."
+      },
+      {
+        "danois": "Jeg bager med modne bananer",
+        "francais": "Je pâtisse avec des bananes mûres",
+        "exemple": "Jeg bager en lækker banankage uden æg med modne bananer.",
+        "exemple_fr": "Je prépare un délicieux gâteau à la banane sans œufs avec des bananes mûres.",
+        "note": "Le verbe « at bage » s'utilise spécifiquement pour la cuisson au four (pain, gâteaux, pâte à pizza)."
+      },
+      {
+        "danois": "Danske jordbær er meget søde",
+        "francais": "Les fraises danoises sont très sucrées",
+        "exemple": "Om sommeren spiser vi danske jordbær og appelsiner.",
+        "exemple_fr": "En été, nous mangeons des fraises danoises et des oranges.",
+        "note": "« Jordbær » signifie littéralement « baie de terre » (jord = terre, bær = baie). Il ne change pas d'orthographe au pluriel !"
+      }
+    ]
+  },
+  {
+    "id": "lesson-5",
+    "title": "Santé, Médecin & Pharmacie",
+    "category": "Santé",
+    "level": "A2.1",
+    "description": "Prendre rendez-vous chez le médecin, expliquer ses symptômes et aller à la pharmacie.",
+    "items": [
+      {
+        "danois": "Jeg har en aftale hos lægen",
+        "francais": "J'ai un rendez-vous chez le médecin",
+        "exemple": "Jeg kan ikke arbejde i morgen, jeg har en aftale hos lægen.",
+        "exemple_fr": "Je ne peux pas travailler demain, j'ai un rendez-vous chez le médecin.",
+        "note": "La préposition « hos » correspond exactement au français « chez » (hos lægen = chez le médecin, hos dyrlægen = chez le vétérinaire)."
+      },
+      {
+        "danois": "Jeg er syg og har ondt i hovedet",
+        "francais": "Je suis malade et j'ai mal à la tête",
+        "exemple": "Jeg bliver hjemme i dag, fordi jeg er syg og har ondt i hovedet.",
+        "exemple_fr": "Je reste à la maison aujourd'hui parce que je suis malade et j'ai mal à la tête.",
+        "note": "Pour exprimer une douleur physique, on utilise la structure « at have ondt i + [partie du corps] »."
+      },
+      {
+        "danois": "Hvor ligger det nærmeste apotek?",
+        "francais": "Où se trouve la pharmacie la plus proche ?",
+        "exemple": "Jeg skal hente medicin. Hvor ligger det nærmeste apotek?",
+        "exemple_fr": "Je dois chercher des médicaments. Où se trouve la pharmacie la plus proche ?",
+        "note": "Les Danois utilisent le verbe de position « at ligge » (être allongé/situé) pour indiquer l'emplacement d'un bâtiment ou d'une ville."
+      }
+    ]
+  }
+]
